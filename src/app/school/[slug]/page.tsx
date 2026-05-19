@@ -164,13 +164,7 @@ export default async function SchoolProfilePage({ params }: { params: { slug: st
           {/* Sidebar */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
 
-            {/* School image if available */}
-            <img
-              src={`/schools/${school.id}.jpg`}
-              alt={s.institutionName}
-              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-              style={{ width: '100%', borderRadius: 'var(--radius-lg)', border: '0.5px solid var(--border)', objectFit: 'cover', aspectRatio: '16/9' }}
-            />
+
 
             {/* Strength signals */}
             <div style={{ background: 'var(--white)', border: '0.5px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.25rem' }}>
