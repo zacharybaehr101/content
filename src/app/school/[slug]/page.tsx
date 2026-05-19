@@ -11,8 +11,15 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const school = await fetchSchoolBySlug(params.slug);
   if (!school) return { title: 'School not found' };
   return {
-    title: `${school.institutionName} — SchoolContent`,
-    description: `Marketing intelligence profile for ${school.institutionName}.`,
+    title: `${school.institutionName} — Catholic School Marketing Profile`,
+    description: `Marketing intelligence profile for ${school.institutionName}. Analyze hero headlines, faith messaging, CTA strategy, belonging language, and full narrative analysis.`,
+    openGraph: {
+      title: `${school.institutionName} — SchoolContent`,
+      description: `See how ${school.institutionName} uses its website to promote enrollment. Hero headlines, CTAs, faith posture, and strategic analysis.`,
+    },
+    alternates: {
+      canonical: `/school/${params.slug}`,
+    },
   };
 }
 
@@ -24,8 +31,24 @@ export default async function SchoolProfilePage({ params }: { params: { slug: st
   const hasDeepAnalysis = hasValue(s.deepNarrativeAnalysis);
   const headline = cleanHeadline(s.heroHeadline);
 
+  // JSON-LD schema for GEO/SEO
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: `${s.institutionName} — Catholic School Marketing Profile`,
+    description: `Marketing intelligence analysis of ${s.institutionName}, a ${s.type} in ${s.city}, ${s.state}.`,
+    about: {
+      '@type': 'EducationalOrganization',
+      name: s.institutionName,
+      address: { '@type': 'PostalAddress', addressLocality: s.city, addressRegion: s.state },
+      url: s.websiteUrl ? `https://${s.websiteUrl}` : undefined,
+    },
+    publisher: { '@type': 'Organization', name: 'SchoolContent' },
+  };
+
   return (
     <div style={{ minHeight: '100vh' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       {/* Header */}
       <div style={{ background: 'var(--navy)', padding: '3rem 0 2.5rem' }}>
         <div className="container">
@@ -52,7 +75,7 @@ export default async function SchoolProfilePage({ params }: { params: { slug: st
       </div>
 
       <div className="container" style={{ padding: '2.5rem 2rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '2rem', alignItems: 'start' }}>
+        <div className="profile-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '2rem', alignItems: 'start' }}>
 
           {/* Main column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -70,8 +93,8 @@ export default async function SchoolProfilePage({ params }: { params: { slug: st
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, var(--red), #c0392b)' }} />
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.25rem' }}>
-                  <div style={{ width: '28px', height: '1px', background: 'var(--red)' }} />
-                  <span style={{ fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--red)' }}>
+                  <div style={{ width: '28px', height: '1px', background: 'var(--parchment-dark)' }} />
+                  <span style={{ fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--parchment-dark)' }}>
                     Full Analysis
                   </span>
                 </div>
@@ -81,7 +104,6 @@ export default async function SchoolProfilePage({ params }: { params: { slug: st
                   fontSize: '1.1rem',
                   color: 'var(--parchment)',
                   lineHeight: 1.75,
-                  fontStyle: 'italic',
                 }}>
                   {s.deepNarrativeAnalysis}
                 </p>
@@ -90,13 +112,13 @@ export default async function SchoolProfilePage({ params }: { params: { slug: st
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '0.5px solid rgba(255,255,255,0.1)' }}>
                   {hasValue(s.deepNotableStrengths) && (
                     <div>
-                      <div style={{ fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--red)', marginBottom: '6px' }}>Notable Strengths</div>
+                      <div style={{ fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--parchment-dark)', marginBottom: '6px' }}>Notable Strengths</div>
                       <p style={{ fontSize: '0.88rem', color: 'var(--parchment-dark)', lineHeight: 1.6 }}>{s.deepNotableStrengths}</p>
                     </div>
                   )}
                   {hasValue(s.deepNotableGaps) && (
                     <div>
-                      <div style={{ fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-faint)', marginBottom: '6px' }}>Notable Gaps</div>
+                      <div style={{ fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--parchment-dark)', marginBottom: '6px' }}>Opportunities</div>
                       <p style={{ fontSize: '0.88rem', color: 'var(--parchment-dark)', lineHeight: 1.6 }}>{s.deepNotableGaps}</p>
                     </div>
                   )}
@@ -164,7 +186,13 @@ export default async function SchoolProfilePage({ params }: { params: { slug: st
           {/* Sidebar */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
 
-
+            {/* School image if available */}
+            <img
+              src={`/schools/${school.id}.jpg`}
+              alt={s.institutionName}
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              style={{ width: '100%', borderRadius: 'var(--radius-lg)', border: '0.5px solid var(--border)', objectFit: 'cover', aspectRatio: '16/9' }}
+            />
 
             {/* Strength signals */}
             <div style={{ background: 'var(--white)', border: '0.5px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.25rem' }}>
