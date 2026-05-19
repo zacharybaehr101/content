@@ -2,8 +2,44 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'SchoolContent — Catholic School Marketing Intelligence',
-  description: 'Search, compare, and learn from how Catholic schools use their websites, social media, and news stories to promote enrollment.',
+  title: {
+    default: 'SchoolContent — Catholic School Marketing Intelligence',
+    template: '%s — SchoolContent',
+  },
+  description: 'Search, compare, and analyze how 100+ Catholic schools use their websites, social media, and news stories to promote enrollment. The definitive marketing intelligence database for Catholic school communications professionals.',
+  keywords: [
+    'Catholic school marketing',
+    'Catholic school communications',
+    'school enrollment marketing',
+    'Catholic high school website analysis',
+    'Catholic university marketing intelligence',
+    'school admissions messaging',
+    'Catholic school branding',
+    'enrollment marketing benchmarking',
+  ],
+  authors: [{ name: 'SchoolContent' }],
+  creator: 'SchoolContent',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://content-mu.vercel.app'),
+  openGraph: {
+    type: 'website',
+    siteName: 'SchoolContent',
+    title: 'SchoolContent — Catholic School Marketing Intelligence',
+    description: 'See how 100+ Catholic schools tell their story. Search hero headlines, CTAs, faith messaging, and strategic analysis across high schools and universities.',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SchoolContent — Catholic School Marketing Intelligence',
+    description: 'See how 100+ Catholic schools tell their story. Search, compare, and benchmark school marketing.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
+  alternates: {
+    canonical: '/',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
