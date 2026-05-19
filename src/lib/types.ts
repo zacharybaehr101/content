@@ -127,3 +127,18 @@ export interface SearchResult {
   tier: UserTier;
   searchesRemaining?: number;
 }
+
+// Admissions page analysis (from "Admissions" tab in Google Sheet)
+export interface AdmissionsAnalysis {
+  institutionName: string;
+  pageType: string;
+  pageUrl: string;
+  heroHeadline: string;
+  primaryMessage: string;
+  ctaLabels: string;
+  keyPhrases: string;
+  notableStrengths: string;
+  opportunities: string;
+  visualTheologyNote: string;
+  narrativeAnalysis: string;
+}
