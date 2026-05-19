@@ -1,5 +1,4 @@
 import { fetchSchoolBySlug, fetchAllSchools } from '@/lib/sheets';
-import { applyTierMask } from '@/lib/search';
 import { notFound } from 'next/navigation';
 
 export async function generateStaticParams() {
@@ -12,7 +11,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   if (!school) return { title: 'School not found' };
   return {
     title: `${school.institutionName} — SchoolContent`,
-    description: `Marketing intelligence profile for ${school.institutionName}. Hero headline, messaging strategy, CTA analysis, and more.`,
+    description: `Marketing intelligence profile for ${school.institutionName}.`,
   };
 }
 
@@ -20,151 +19,118 @@ export default async function SchoolProfilePage({ params }: { params: { slug: st
   const school = await fetchSchoolBySlug(params.slug);
   if (!school) notFound();
 
-  // Show free tier data — auth middleware will handle real tier in Phase 4
-  const tier = 'free';
-  const masked = applyTierMask(school, tier);
-
-  const isLocked = (value: any) => value === undefined || value === null;
+  // Free tier shows full profile — paid tiers unlock more pages and export
+  const s = school;
 
   return (
     <div style={{ minHeight: '100vh' }}>
-      {/* Profile header */}
       <div style={{ background: 'var(--navy)', padding: '3rem 0 2.5rem' }}>
         <div className="container">
-          <a href="/search" style={{ fontSize: '0.72rem', color: 'var(--ink-faint)', letterSpacing: '0.06em', display: 'inline-flex', alignItems: 'center', gap: '4px', marginBottom: '1.5rem' }}>
+          <a href="/search" style={{ fontSize: '0.9rem', color: 'var(--ink-faint)', display: 'inline-flex', alignItems: 'center', gap: '4px', marginBottom: '1.5rem', textDecoration: 'none' }}>
             ← Back to search
           </a>
 
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
-            <span className="tag tag-red">{school.type?.includes('High School') ? 'High School' : 'University'}</span>
-            <span className="tag" style={{ background: 'rgba(255,255,255,0.1)', color: 'var(--parchment-dark)', borderColor: 'rgba(255,255,255,0.2)' }}>{school.region}</span>
-            {school.religiousOrder && school.religiousOrder !== 'N/A' && (
-              <span className="tag" style={{ background: 'rgba(255,255,255,0.1)', color: 'var(--parchment-dark)', borderColor: 'rgba(255,255,255,0.2)' }}>{school.religiousOrder}</span>
+            <span className="tag tag-red">{s.type?.includes('High School') ? 'High School' : 'University'}</span>
+            <span className="tag" style={{ background: 'rgba(255,255,255,0.1)', color: 'var(--parchment-dark)', borderColor: 'rgba(255,255,255,0.2)' }}>{s.region}</span>
+            {s.religiousOrder && s.religiousOrder !== 'N/A' && (
+              <span className="tag" style={{ background: 'rgba(255,255,255,0.1)', color: 'var(--parchment-dark)', borderColor: 'rgba(255,255,255,0.2)' }}>{s.religiousOrder}</span>
             )}
           </div>
 
-          <h1 style={{ color: '#fff', fontWeight: 400, fontStyle: 'italic', marginBottom: '4px' }}>
-            {school.institutionName}
+          <h1 style={{ color: '#fff', fontWeight: 400, fontStyle: 'italic', marginBottom: '6px', fontSize: '2.5rem' }}>
+            {s.institutionName}
           </h1>
-          <p style={{ color: 'var(--ink-faint)', fontSize: '0.88rem' }}>
-            {school.city}, {school.state} ·{' '}
-            <a href={`https://${school.websiteUrl}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--parchment-dark)' }}>
-              {school.websiteUrl} ↗
+          <p style={{ color: 'var(--ink-faint)', fontSize: '1rem' }}>
+            {s.city}, {s.state} ·{' '}
+            <a href={`https://${s.websiteUrl}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--parchment-dark)' }}>
+              {s.websiteUrl} ↗
             </a>
           </p>
         </div>
       </div>
 
       <div className="container" style={{ padding: '2.5rem 2rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '2rem', alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '2rem', alignItems: 'start' }}>
 
-          {/* Main content */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
-            {/* Hero headline */}
             <ProfileSection title="Hero Headline">
-              {school.heroHeadline ? (
-                <blockquote style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '1.25rem',
-                  fontStyle: 'italic',
-                  color: 'var(--navy)',
-                  borderLeft: '3px solid var(--red)',
-                  paddingLeft: '1.25rem',
-                  margin: '0 0 1rem',
-                  lineHeight: 1.4,
-                }}>
-                  "{school.heroHeadline.replace(/^"|"$/g, '')}"
+              {s.heroHeadline && (
+                <blockquote style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontStyle: 'italic', color: 'var(--navy)', borderLeft: '3px solid var(--red)', paddingLeft: '1.25rem', margin: '0 0 1.25rem', lineHeight: 1.4 }}>
+                  &ldquo;{s.heroHeadline.replace(/^"|"$/g, '')}&rdquo;
                 </blockquote>
-              ) : null}
-              <DataRow label="Message type" value={school.heroMessageType} />
-              <DataRow label="Primary audience" value={masked.primaryAudienceFocus} locked={isLocked(masked.primaryAudienceFocus)} />
-              <DataRow label="Faith identity posture" value={school.faithIdentityPosture} />
+              )}
+              <DataRow label="Message type" value={s.heroMessageType} />
+              <DataRow label="Primary audience" value={s.primaryAudienceFocus} />
+              <DataRow label="Faith identity posture" value={s.faithIdentityPosture} />
+              <DataRow label="Catholic order named on homepage" value={s.catholicOrderNamedOnHomepage} />
             </ProfileSection>
 
-            {/* Messaging analysis */}
             <ProfileSection title="Messaging Analysis">
-              <DataRow label="Strongest phrase" value={masked.strongestPhrase} locked={isLocked(masked.strongestPhrase)} verbatim />
-              <DataRow label="Weakest pattern" value={masked.weakestPatternIdentified} locked={isLocked(masked.weakestPatternIdentified)} />
-              <DataRow label="CTA labels" value={masked.ctaLabels} locked={isLocked(masked.ctaLabels)} verbatim />
-              <DataRow label="Nav top labels" value={(masked as any).navTopLabels} locked={isLocked((masked as any).navTopLabels)} />
+              <DataRow label="Strongest phrase" value={s.strongestPhrase} verbatim />
+              <DataRow label="Weakest pattern" value={s.weakestPatternIdentified} />
+              <DataRow label="CTA labels" value={s.ctaLabels} verbatim />
+              <DataRow label="Nav top labels" value={s.navTopLabels} />
             </ProfileSection>
 
-            {/* Signals */}
             <ProfileSection title="Content Signals">
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                <SignalBadge label="Financial aid language" value={masked.financialAidLanguagePresent} locked={isLocked(masked.financialAidLanguagePresent)} />
-                <SignalBadge label="Outcomes / placement data" value={masked.outcomesPlacementDataShown} locked={isLocked(masked.outcomesPlacementDataShown)} />
-                <SignalBadge label="Student quotes" value={masked.studentQuotesPresent} locked={isLocked(masked.studentQuotesPresent)} />
-                <SignalBadge label="Fresh news & events" value={masked.newsEventsFresh} locked={isLocked(masked.newsEventsFresh)} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <SignalBadge label="Financial aid language" value={s.financialAidLanguagePresent} />
+                <SignalBadge label="Outcomes / placement data" value={s.outcomesPlacementDataShown} />
+                <SignalBadge label="Student quotes" value={s.studentQuotesPresent} />
+                <SignalBadge label="Fresh news & events" value={s.newsEventsFresh} />
               </div>
             </ProfileSection>
 
-            {/* Strategic analysis — locked for free */}
             <ProfileSection title="Strategic Analysis">
-              <LockedSection
-                label="Competitive differentiation vs. state schools"
-                value={(masked as any).competitiveDifferentiationVsStateSchool}
-                locked={isLocked((masked as any).competitiveDifferentiationVsStateSchool)}
-              />
-              <LockedSection
-                label="Recommended outreach angle"
-                value={(masked as any).recommendedOutreachAngle}
-                locked={isLocked((masked as any).recommendedOutreachAngle)}
-              />
-              <LockedSection
-                label="Visual theology — image type"
-                value={(masked as any).visualTheologyImageType}
-                locked={isLocked((masked as any).visualTheologyImageType)}
-              />
+              <AnalysisBlock label="Competitive differentiation vs. state schools" value={s.competitiveDifferentiationVsStateSchool} />
+              <AnalysisBlock label="Recommended outreach angle" value={s.recommendedOutreachAngle} />
+              <AnalysisBlock label="Visual theology — image type" value={s.visualTheologyImageType} />
+              <AnalysisBlock label="Founder's charism used as lens" value={s.foundersCharismUsedAsLens} />
             </ProfileSection>
+
           </div>
 
-          {/* Sidebar */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
 
-            {/* Scores */}
             <div style={{ background: 'var(--white)', border: '0.5px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.25rem' }}>
-              <div style={{ fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--red)', marginBottom: '1rem' }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--red)', marginBottom: '1rem' }}>
                 Strength signals
               </div>
-              <ScoreRow label="Belonging language" value={school.belongingLanguageStrength} />
-              <ScoreRow label="Prestige language" value={school.prestigeLanguageLevel} />
-              <ScoreRow label="Admissions CTA" value={masked.admissionsCtaProminence} locked={isLocked(masked.admissionsCtaProminence)} />
-              <ScoreRow label="Mobile friction" value={masked.mobileFrictionTapsToInquiry} locked={isLocked(masked.mobileFrictionTapsToInquiry)} />
+              <ScoreRow label="Belonging language" value={s.belongingLanguageStrength} />
+              <ScoreRow label="Prestige language" value={s.prestigeLanguageLevel} />
+              <ScoreRow label="Service / justice language" value={s.serviceJusticeLanguage} />
+              <ScoreRow label="Admissions CTA" value={s.admissionsCtaProminence} />
+              <ScoreRow label="Mobile friction (taps)" value={s.mobileFrictionTapsToInquiry} />
             </div>
 
-            {/* Upgrade CTA */}
-            <div style={{
-              background: 'var(--navy)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '1.5rem',
-              textAlign: 'center',
-            }}>
-              <div style={{ fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-faint)', marginBottom: '8px' }}>
-                Free plan
+            <div style={{ background: 'var(--white)', border: '0.5px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.25rem' }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--red)', marginBottom: '1rem' }}>
+                School info
               </div>
-              <p style={{ fontFamily: 'var(--font-display)', color: '#fff', fontSize: '1rem', marginBottom: '8px' }}>
-                Unlock the full profile
+              <DataRow label="Diocese / Province" value={s.dioceseOrProvince} />
+              <DataRow label="Enrollment" value={s.enrollmentRange} />
+              <DataRow label="Primary social" value={s.primarySocialPlatform} />
+              <DataRow label="Pages analyzed" value={s.pagesAnalyzed} />
+              <DataRow label="Date analyzed" value={s.dateAnalyzed} />
+            </div>
+
+            <div style={{ background: 'var(--navy)', borderRadius: 'var(--radius-lg)', padding: '1.5rem', textAlign: 'center' }}>
+              <div style={{ fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-faint)', marginBottom: '8px' }}>
+                Want more?
+              </div>
+              <p style={{ fontFamily: 'var(--font-display)', color: '#fff', fontSize: '1.1rem', marginBottom: '8px' }}>
+                Unlock all pages & export
               </p>
-              <p style={{ fontSize: '0.78rem', color: 'var(--ink-faint)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
-                Get verbatim phrases, strategic analysis, and all 41 data points.
+              <p style={{ fontSize: '0.88rem', color: 'var(--ink-faint)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+                Individual plan adds admissions, academics, and faith pages plus CSV export.
               </p>
-              <a href="/pricing" className="btn btn-primary" style={{ background: 'var(--red)', borderColor: 'var(--red)', width: '100%', justifyContent: 'center', fontSize: '0.75rem' }}>
+              <a href="/pricing" className="btn btn-primary" style={{ background: 'var(--red)', borderColor: 'var(--red)', width: '100%', justifyContent: 'center', fontSize: '0.85rem' }}>
                 Upgrade — from $49/mo
               </a>
             </div>
 
-            {/* School info */}
-            <div style={{ background: 'var(--white)', border: '0.5px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.25rem' }}>
-              <div style={{ fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--red)', marginBottom: '1rem' }}>
-                School info
-              </div>
-              <DataRow label="Diocese / Province" value={masked.dioceseOrProvince} locked={isLocked(masked.dioceseOrProvince)} />
-              <DataRow label="Enrollment" value={school.enrollmentRange} />
-              <DataRow label="Primary social" value={school.primarySocialPlatform} />
-              <DataRow label="Analyzed" value={school.dateAnalyzed} />
-            </div>
           </div>
         </div>
       </div>
@@ -174,8 +140,8 @@ export default async function SchoolProfilePage({ params }: { params: { slug: st
 
 function ProfileSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: 'var(--white)', border: '0.5px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.5rem' }}>
-      <div style={{ fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--red)', marginBottom: '1.25rem' }}>
+    <div style={{ background: 'var(--white)', border: '0.5px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.75rem' }}>
+      <div style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--red)', marginBottom: '1.25rem' }}>
         {title}
       </div>
       {children}
@@ -183,73 +149,46 @@ function ProfileSection({ title, children }: { title: string; children: React.Re
   );
 }
 
-function DataRow({ label, value, locked, verbatim }: { label: string; value?: any; locked?: boolean; verbatim?: boolean }) {
+function DataRow({ label, value, verbatim }: { label: string; value?: any; verbatim?: boolean }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', padding: '8px 0', borderBottom: '0.5px solid var(--border-light)' }}>
-      <span style={{ fontSize: '0.78rem', color: 'var(--ink-light)', flexShrink: 0, minWidth: '140px' }}>{label}</span>
-      {locked ? (
-        <span style={{ fontSize: '0.78rem', color: 'var(--ink-faint)', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <span>🔒</span> <a href="/pricing" style={{ color: 'var(--red)', fontSize: '0.72rem' }}>Upgrade to unlock</a>
-        </span>
-      ) : (
-        <span style={{ fontSize: '0.82rem', color: 'var(--ink)', textAlign: 'right', fontStyle: verbatim ? 'italic' : 'normal', fontFamily: verbatim ? 'var(--font-display)' : 'inherit' }}>
-          {value || '—'}
-        </span>
-      )}
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', padding: '10px 0', borderBottom: '0.5px solid var(--border-light)' }}>
+      <span style={{ fontSize: '0.9rem', color: 'var(--ink-light)', flexShrink: 0, minWidth: '160px' }}>{label}</span>
+      <span style={{ fontSize: '0.95rem', color: 'var(--ink)', textAlign: 'right', fontStyle: verbatim ? 'italic' : 'normal', fontFamily: verbatim ? 'var(--font-display)' : 'inherit' }}>
+        {value || '—'}
+      </span>
     </div>
   );
 }
 
-function ScoreRow({ label, value, locked }: { label: string; value?: any; locked?: boolean }) {
-  const color = value === 'Strong' ? 'var(--navy)' : value === 'Weak' || value === 'Absent' ? 'var(--ink-faint)' : 'var(--ink-mid)';
+function ScoreRow({ label, value }: { label: string; value?: any }) {
+  const color = typeof value === 'string' && value.toLowerCase().startsWith('strong') ? 'var(--navy)'
+    : typeof value === 'string' && (value.toLowerCase().startsWith('weak') || value.toLowerCase() === 'absent') ? 'var(--ink-faint)'
+    : 'var(--ink-mid)';
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: '0.5px solid var(--border-light)' }}>
-      <span style={{ fontSize: '0.78rem', color: 'var(--ink-light)' }}>{label}</span>
-      {locked ? (
-        <span style={{ fontSize: '0.7rem', color: 'var(--ink-faint)' }}>🔒</span>
-      ) : (
-        <span style={{ fontSize: '0.78rem', fontWeight: 600, color }}>{value || '—'}</span>
-      )}
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', padding: '8px 0', borderBottom: '0.5px solid var(--border-light)' }}>
+      <span style={{ fontSize: '0.88rem', color: 'var(--ink-light)' }}>{label}</span>
+      <span style={{ fontSize: '0.88rem', fontWeight: 600, color, textAlign: 'right', maxWidth: '55%' }}>{value || '—'}</span>
     </div>
   );
 }
 
-function SignalBadge({ label, value, locked }: { label: string; value?: any; locked?: boolean }) {
+function SignalBadge({ label, value }: { label: string; value?: any }) {
   const isYes = typeof value === 'string' && (value.toLowerCase().startsWith('yes') || value.toLowerCase() === 'true');
   return (
-    <div style={{ background: 'var(--parchment)', border: '0.5px solid var(--border)', borderRadius: 'var(--radius)', padding: '10px 12px' }}>
-      <div style={{ fontSize: '0.68rem', color: 'var(--ink-light)', marginBottom: '4px' }}>{label}</div>
-      {locked ? (
-        <span style={{ fontSize: '0.72rem', color: 'var(--ink-faint)' }}>🔒 <a href="/pricing" style={{ color: 'var(--red)' }}>Unlock</a></span>
-      ) : (
-        <span style={{ fontSize: '0.78rem', fontWeight: 600, color: isYes ? 'var(--navy)' : 'var(--ink-light)' }}>
-          {value || '—'}
-        </span>
-      )}
+    <div style={{ background: 'var(--parchment)', border: '0.5px solid var(--border)', borderRadius: 'var(--radius)', padding: '12px 14px' }}>
+      <div style={{ fontSize: '0.78rem', color: 'var(--ink-light)', marginBottom: '5px' }}>{label}</div>
+      <span style={{ fontSize: '0.9rem', fontWeight: 600, color: isYes ? 'var(--navy)' : 'var(--ink-light)' }}>
+        {value || '—'}
+      </span>
     </div>
   );
 }
 
-function LockedSection({ label, value, locked }: { label: string; value?: any; locked?: boolean }) {
-  if (!locked && value) {
-    return (
-      <div style={{ marginBottom: '1rem' }}>
-        <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--ink-light)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>{label}</div>
-        <p style={{ fontSize: '0.88rem', color: 'var(--ink)', lineHeight: 1.6 }}>{value}</p>
-      </div>
-    );
-  }
+function AnalysisBlock({ label, value }: { label: string; value?: any }) {
   return (
-    <div style={{ marginBottom: '1rem', background: 'var(--parchment-mid)', borderRadius: 'var(--radius)', padding: '12px 14px', border: '0.5px solid var(--border)' }}>
-      <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--ink-light)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>{label}</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-        <span style={{ fontSize: '0.82rem', color: 'var(--ink-faint)', filter: 'blur(4px)', userSelect: 'none' }}>
-          This content is only visible on paid plans.
-        </span>
-      </div>
-      <a href="/pricing" style={{ fontSize: '0.72rem', color: 'var(--red)', fontWeight: 600, display: 'inline-block', marginTop: '6px' }}>
-        🔒 Upgrade to read →
-      </a>
+    <div style={{ marginBottom: '1.25rem' }}>
+      <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--ink-light)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '5px' }}>{label}</div>
+      <p style={{ fontSize: '0.95rem', color: 'var(--ink)', lineHeight: 1.65 }}>{value || '—'}</p>
     </div>
   );
 }
