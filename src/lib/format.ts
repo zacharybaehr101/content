@@ -27,7 +27,7 @@ export function toTitleCase(str: string): string {
  * - Converts ALL CAPS to Title Case
  */
 export function cleanQuote(str: string | undefined): string {
-  if (!str) return str;
+  if (!str) return '';
   // Remove escaped quotes and regular surrounding quotes
   let cleaned = str.replace(/^\\?"/, '').replace(/\\?"$/, '');
   cleaned = cleaned.replace(/^"/, '').replace(/"$/, '');
@@ -41,7 +41,7 @@ export function cleanQuote(str: string | undefined): string {
  * institutional name-only headlines
  */
 export function cleanHeadline(str: string | undefined): string {
-  if (!str) return str;
+  if (!str) return '';
   return cleanQuote(str);
 }
 
