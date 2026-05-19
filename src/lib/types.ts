@@ -165,3 +165,63 @@ export interface SearchResult {
   tier: UserTier;
   searchesRemaining?: number;
 }
+
+// Deep analysis fields from Sheet 2 (merged into Sheet 1)
+export interface SchoolDeepAnalysis {
+  deepPageType?: string;
+  deepPageUrl?: string;
+  deepHeroHeadline?: string;
+  deepPrimaryMessage?: string;
+  deepCtaLabels?: string;
+  deepKeyPhrases?: string;
+  deepNotableStrengths?: string;
+  deepNotableGaps?: string;
+  deepVisualTheologyNote?: string;
+  deepNarrativeAnalysis?: string;
+}
+
+// Extend School with deep analysis
+export interface School extends SchoolDeepAnalysis {
+  id: string;
+  institutionName: string;
+  type: SchoolType;
+  religiousOrder: string;
+  dioceseOrProvince: string;
+  city: string;
+  state: string;
+  region: Region;
+  enrollmentSize: string;
+  enrollmentRange: EnrollmentRange;
+  websiteUrl: string;
+  dateAnalyzed: string;
+  pagesAnalyzed: string;
+  instagramUrl: string;
+  facebookUrl: string;
+  linkedInUrl: string;
+  twitterUrl: string;
+  youtubeUrl: string;
+  tiktokUrl: string;
+  primarySocialPlatform: string;
+  heroHeadline: string;
+  heroMessageType: string;
+  primaryAudienceFocus: string;
+  faithIdentityPosture: string;
+  catholicOrderNamedOnHomepage: string;
+  strongestPhrase: string;
+  weakestPatternIdentified: string;
+  ctaLabels: string;
+  financialAidLanguagePresent: string;
+  outcomesPlacementDataShown: string;
+  studentQuotesPresent: string;
+  newsEventsFresh: string;
+  belongingLanguageStrength: StrengthLevel;
+  prestigeLanguageLevel: StrengthLevel;
+  serviceJusticeLanguage: string;
+  navTopLabels: string;
+  admissionsCtaProminence: string;
+  visualTheologyImageType: string;
+  foundersCharismUsedAsLens: string;
+  mobileFrictionTapsToInquiry: string;
+  competitiveDifferentiationVsStateSchool: string;
+  recommendedOutreachAngle: string;
+}
