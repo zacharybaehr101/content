@@ -102,6 +102,50 @@ export async function fetchSchoolBySlug(slug: string): Promise<School | null> {
   return all.find((s) => s.id === slug) ?? null;
 }
 
+/**
+ * Fetches all admissions page analyses from the "Admissions" tab.
+ * Returns a map of slugified institution name → AdmissionsAnalysis
+ * for fast lookup on school profile pages.
+ */
+export async function fetchAdmissionsData(): Promise<Map<string, import('./types').AdmissionsAnalysis>> {
+  const range = encodeURIComponent(`Admissions!A2:K`);
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
+
+  const res = await fetch(url, {
+    next: { revalidate: CACHE_REVALIDATE_SECONDS },
+  });
+
+  if (!res.ok) {
+    console.error(`Admissions sheet error: ${res.status}`);
+    return new Map();
+  }
+
+  const data = await res.json();
+  const rows: string[][] = data.values ?? [];
+  const map = new Map<string, import('./types').AdmissionsAnalysis>();
+
+  for (const row of rows) {
+    const get = (i: number) => (row[i] ?? '').trim();
+    const name = get(0);
+    if (!name) continue;
+    map.set(slugify(name), {
+      institutionName: name,
+      pageType: get(1),
+      pageUrl: get(2),
+      heroHeadline: get(3),
+      primaryMessage: get(4),
+      ctaLabels: get(5),
+      keyPhrases: get(6),
+      notableStrengths: get(7),
+      opportunities: get(8),
+      visualTheologyNote: get(9),
+      narrativeAnalysis: get(10),
+    });
+  }
+
+  return map;
+}
+
 export async function fetchFilterOptions() {
   const schools = await fetchAllSchools();
   const unique = (field: keyof School) =>
