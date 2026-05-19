@@ -4,7 +4,7 @@ import { applyTierMask } from '@/lib/search';
 import { UserTier } from '@/lib/types';
 
 export const runtime = 'nodejs';
-
+export const dynamic = 'force-dynamic';
 /**
  * GET /api/schools/[slug]
  *
