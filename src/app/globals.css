@@ -27,23 +27,23 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+html { font-size: 20px; -webkit-font-smoothing: antialiased; }
 
 body {
   font-family: var(--font-body);
   background: var(--parchment);
   color: var(--ink);
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 /* Typography */
 h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.2; color: var(--navy); }
-h1 { font-size: clamp(2rem, 4vw, 3rem); }
-h2 { font-size: clamp(1.4rem, 2.5vw, 1.9rem); }
-h3 { font-size: 1.25rem; }
-h4 { font-size: 1rem; }
+h1 { font-size: clamp(2.2rem, 4vw, 3.5rem); }
+h2 { font-size: clamp(1.6rem, 2.5vw, 2.2rem); }
+h3 { font-size: 1.4rem; }
+h4 { font-size: 1.1rem; }
 
-p { color: var(--ink-mid); line-height: 1.7; }
+p { color: var(--ink-mid); line-height: 1.75; font-size: 1rem; }
 
 a { color: var(--navy); text-decoration: none; }
 a:hover { color: var(--red); }
