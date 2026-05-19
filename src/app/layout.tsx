@@ -62,9 +62,7 @@ function SiteHeader() {
               borderRadius: 'var(--radius)',
               transition: 'color 0.15s',
             }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'var(--parchment-dark)')}
-            >
+           >
               {label}
             </a>
           ))}
