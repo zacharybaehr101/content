@@ -1,0 +1,167 @@
+export type SchoolType = 'High School' | 'University' | 'Archdiocese' | string;
+export type Region = 'Northeast' | 'Southeast' | 'Midwest' | 'Southwest' | 'Mountain West' | 'South' | string;
+export type EnrollmentRange = '< 500' | '500-999' | '1,000-1,499' | '1,500+' | string;
+export type StrengthLevel = 'Strong' | 'Moderate' | 'Weak' | 'Absent' | string;
+
+export interface School {
+  // Identity
+  id: string; // slug generated from name
+  institutionName: string;
+  type: SchoolType;
+  religiousOrder: string;
+  dioceseOrProvince: string;
+  city: string;
+  state: string;
+  region: Region;
+  enrollmentSize: string;
+  enrollmentRange: EnrollmentRange;
+  websiteUrl: string;
+  dateAnalyzed: string;
+  pagesAnalyzed: string;
+
+  // Social
+  instagramUrl: string;
+  facebookUrl: string;
+  linkedInUrl: string;
+  twitterUrl: string;
+  youtubeUrl: string;
+  tiktokUrl: string;
+  primarySocialPlatform: string;
+
+  // Homepage Copy Analysis
+  heroHeadline: string;
+  heroMessageType: string;
+  primaryAudienceFocus: string;
+  faithIdentityPosture: string;
+  catholicOrderNamedOnHomepage: string;
+  strongestPhrase: string;
+  weakestPatternIdentified: string;
+  ctaLabels: string;
+
+  // Feature Flags
+  financialAidLanguagePresent: string;
+  outcomesPlacementDataShown: string;
+  studentQuotesPresent: string;
+  newsEventsFresh: string;
+
+  // Qualitative Scores
+  belongingLanguageStrength: StrengthLevel;
+  prestigeLanguageLevel: StrengthLevel;
+  serviceJusticeLanguage: string;
+
+  // Navigation & UX
+  navTopLabels: string;
+  admissionsCtaProminence: string;
+  visualTheologyImageType: string;
+  foundersCharismUsedAsLens: string;
+  mobileFrictionTapsToInquiry: string;
+
+  // Strategic Analysis
+  competitiveDifferentiationVsStateSchool: string;
+  recommendedOutreachAngle: string;
+}
+
+// The subset of fields available on free tier
+export const FREE_FIELDS: (keyof School)[] = [
+  'id',
+  'institutionName',
+  'type',
+  'religiousOrder',
+  'city',
+  'state',
+  'region',
+  'enrollmentRange',
+  'websiteUrl',
+  'primarySocialPlatform',
+  'heroHeadline',
+  'heroMessageType',
+  'faithIdentityPosture',
+  'belongingLanguageStrength',
+  'prestigeLanguageLevel',
+];
+
+// Fields gated behind Individual ($49) tier
+export const INDIVIDUAL_FIELDS: (keyof School)[] = [
+  ...FREE_FIELDS,
+  'dioceseOrProvince',
+  'enrollmentSize',
+  'primaryAudienceFocus',
+  'strongestPhrase',
+  'ctaLabels',
+  'financialAidLanguagePresent',
+  'outcomesPlacementDataShown',
+  'studentQuotesPresent',
+  'newsEventsFresh',
+  'serviceJusticeLanguage',
+  'admissionsCtaProminence',
+  'mobileFrictionTapsToInquiry',
+];
+
+// Fields gated behind Premium ($149) tier — all fields
+export const PREMIUM_FIELDS: (keyof School)[] = [
+  'id',
+  'institutionName',
+  'type',
+  'religiousOrder',
+  'dioceseOrProvince',
+  'city',
+  'state',
+  'region',
+  'enrollmentSize',
+  'enrollmentRange',
+  'websiteUrl',
+  'dateAnalyzed',
+  'pagesAnalyzed',
+  'instagramUrl',
+  'facebookUrl',
+  'linkedInUrl',
+  'twitterUrl',
+  'youtubeUrl',
+  'tiktokUrl',
+  'primarySocialPlatform',
+  'heroHeadline',
+  'heroMessageType',
+  'primaryAudienceFocus',
+  'faithIdentityPosture',
+  'catholicOrderNamedOnHomepage',
+  'strongestPhrase',
+  'weakestPatternIdentified',
+  'ctaLabels',
+  'financialAidLanguagePresent',
+  'outcomesPlacementDataShown',
+  'studentQuotesPresent',
+  'newsEventsFresh',
+  'belongingLanguageStrength',
+  'prestigeLanguageLevel',
+  'serviceJusticeLanguage',
+  'navTopLabels',
+  'admissionsCtaProminence',
+  'visualTheologyImageType',
+  'foundersCharismUsedAsLens',
+  'mobileFrictionTapsToInquiry',
+  'competitiveDifferentiationVsStateSchool',
+  'recommendedOutreachAngle',
+];
+
+export type UserTier = 'free' | 'individual' | 'premium' | 'agency' | 'enterprise';
+
+export interface SearchParams {
+  query?: string;
+  type?: SchoolType;
+  region?: Region;
+  religiousOrder?: string;
+  state?: string;
+  enrollmentRange?: EnrollmentRange;
+  faithPosture?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface SearchResult {
+  schools: Partial<School>[];
+  total: number;
+  page: number;
+  totalPages: number;
+  tier: UserTier;
+  searchesRemaining?: number;
+}
