@@ -139,6 +139,15 @@ export default async function HomePage() {
                 padding: '1.5rem',
                 transition: 'border-color 0.15s, box-shadow 0.15s',
                 textDecoration: 'none',
+              }}
+              onMouseEnter={e => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = 'var(--navy)';
+              }}
+              onMouseLeave={e => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = 'var(--border)';
+              }}
               >
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
                   <span className="tag tag-red">{school.type?.includes('High School') ? 'High School' : 'University'}</span>
