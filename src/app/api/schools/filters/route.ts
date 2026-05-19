@@ -3,7 +3,7 @@ import { searchSchools } from '@/lib/search';
 import { SearchParams, UserTier } from '@/lib/types';
 
 export const runtime = 'nodejs';
-
+export const dynamic = 'force-dynamic';
 /**
  * GET /api/schools
  *
