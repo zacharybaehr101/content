@@ -41,6 +41,7 @@ function SiteHeader() {
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
+          textDecoration: 'none',
         }}>
           <span style={{ color: 'var(--ink-faint)', fontStyle: 'italic' }}>School</span>
           <span style={{ color: '#fff', fontWeight: 600 }}>Content</span>
@@ -60,25 +61,37 @@ function SiteHeader() {
               color: 'var(--parchment-dark)',
               padding: '6px 12px',
               borderRadius: 'var(--radius)',
-              transition: 'color 0.15s',
-            }}
-           >
+              textDecoration: 'none',
+            }}>
               {label}
             </a>
           ))}
-          <a href="/login" className="btn btn-outline" style={{
+          <a href="/login" style={{
             marginLeft: '8px',
-            color: 'var(--parchment)',
-            borderColor: 'rgba(255,255,255,0.25)',
             fontSize: '0.72rem',
+            fontWeight: 600,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: 'var(--parchment)',
+            padding: '8px 16px',
+            borderRadius: 'var(--radius)',
+            border: '1.5px solid rgba(255,255,255,0.25)',
+            textDecoration: 'none',
           }}>
             Sign in
           </a>
-          <a href="/signup" className="btn btn-primary" style={{
+          <a href="/signup" style={{
             marginLeft: '4px',
-            background: 'var(--red)',
-            borderColor: 'var(--red)',
             fontSize: '0.72rem',
+            fontWeight: 600,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: '#fff',
+            padding: '8px 16px',
+            borderRadius: 'var(--radius)',
+            background: 'var(--red)',
+            border: '1.5px solid var(--red)',
+            textDecoration: 'none',
           }}>
             Get access
           </a>
@@ -125,7 +138,7 @@ function SiteFooter() {
             <div key={heading}>
               <p style={{ fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-faint)', marginBottom: '10px' }}>{heading}</p>
               {links.map(l => (
-                <a key={l} href={`/${l.toLowerCase()}`} style={{ display: 'block', fontSize: '0.82rem', color: 'var(--parchment-dark)', marginBottom: '6px' }}>{l}</a>
+                <a key={l} href={`/${l.toLowerCase()}`} style={{ display: 'block', fontSize: '0.82rem', color: 'var(--parchment-dark)', marginBottom: '6px', textDecoration: 'none' }}>{l}</a>
               ))}
             </div>
           ))}
