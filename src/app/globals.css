@@ -144,3 +144,79 @@ a:hover { color: var(--red); }
 .text-red { color: var(--red); }
 .text-navy { color: var(--navy); }
 .font-display { font-family: var(--font-display); }
+
+/* =====================
+   MOBILE RESPONSIVE
+   ===================== */
+
+/* Nav — collapse on mobile */
+@media (max-width: 768px) {
+  /* Container padding */
+  .container { padding: 0 1rem; }
+
+  /* Header nav — hide text links, keep CTAs */
+  header nav a:not([href="/login"]):not([href="/signup"]) {
+    display: none;
+  }
+
+  /* Hero text */
+  h1 { font-size: clamp(1.6rem, 6vw, 2.5rem); }
+  h2 { font-size: clamp(1.2rem, 4vw, 1.8rem); }
+
+  /* Search page — stack filters vertically */
+  .search-filters { flex-direction: column; }
+
+  /* School profile — stack sidebar below main */
+  .profile-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Deep analysis sub-fields — stack vertically */
+  .deep-sub-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* School cards — single column */
+  .school-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Stats bar — 2 columns */
+  .stats-bar {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  /* Pricing grid — single column */
+  .pricing-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* What's in database — 2 col on mobile */
+  .features-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* DataRow — stack label above value */
+  .data-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  /* Buttons — full width on mobile */
+  .btn-group { flex-direction: column; width: 100%; }
+  .btn-group .btn { width: 100%; justify-content: center; }
+
+  /* Header height */
+  header .container { height: auto; padding: 1rem; flex-wrap: wrap; gap: 0.75rem; }
+
+  /* Footer */
+  footer .container { flex-direction: column; }
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: 1.5rem; }
+  .features-grid { grid-template-columns: 1fr !important; }
+  .tag { font-size: 0.6rem !important; }
+}
