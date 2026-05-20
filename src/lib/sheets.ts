@@ -2,7 +2,7 @@ import { School } from './types';
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const API_KEY = process.env.GOOGLE_SHEETS_API_KEY!;
-const SHEET_NAME = 'Sheet1';
+const SHEET_NAME = 'Home';
 
 export const CACHE_REVALIDATE_SECONDS = 21600;
 
