@@ -1,10 +1,15 @@
 import { fetchAllSchools, fetchFilterOptions } from '@/lib/sheets';
+import { School } from '@/lib/types';
 
 export default async function HomePage() {
-  const [schools, filters] = await Promise.all([
-    fetchAllSchools(),
-    fetchFilterOptions(),
-  ]);
+  let schools: School[] = [];
+  let filters = { regions: [] as string[], types: [] as string[], states: [] as string[], religiousOrders: [] as string[], enrollmentRanges: [] as string[], faithPostures: [] as string[] };
+
+  try {
+    [schools, filters] = await Promise.all([fetchAllSchools(), fetchFilterOptions()]);
+  } catch (err) {
+    console.error('Homepage data error:', err);
+  }
 
   const totalSchools = schools.length;
   const highSchools = schools.filter(s => s.type?.includes('High School')).length;
@@ -140,7 +145,15 @@ export default async function HomePage() {
                 transition: 'border-color 0.15s, box-shadow 0.15s',
                 textDecoration: 'none',
               }}
-             >
+              onMouseEnter={e => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = 'var(--navy)';
+              }}
+              onMouseLeave={e => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = 'var(--border)';
+              }}
+              >
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
                   <span className="tag tag-red">{school.type?.includes('High School') ? 'High School' : 'University'}</span>
                   <span className="tag">{school.region}</span>
