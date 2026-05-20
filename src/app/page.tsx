@@ -1,6 +1,8 @@
 import { fetchAllSchools, fetchFilterOptions } from '@/lib/sheets';
 import { School } from '@/lib/types';
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   let schools: School[] = [];
   let filters = { regions: [] as string[], types: [] as string[], states: [] as string[], religiousOrders: [] as string[], enrollmentRanges: [] as string[], faithPostures: [] as string[] };
