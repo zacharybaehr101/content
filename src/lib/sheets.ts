@@ -78,7 +78,7 @@ function rowToSchool(row: string[]): School {
 }
 
 export async function fetchAllSchools(): Promise<School[]> {
-  const range = encodeURIComponent(`${SHEET_NAME}!A2:BZ`);
+  const range = encodeURIComponent(`${SHEET_NAME}!A2:Z1000`);
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
 
   const res = await fetch(url, {
