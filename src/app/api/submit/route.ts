@@ -7,7 +7,6 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const get = (key: string) => formData.get(key)?.toString() ?? '';
 
-    // Build email body
     const body = `
 New School Submission — SchoolContent
 
@@ -39,63 +38,49 @@ CONTACT
 Name: ${get('contactName')}
 Email: ${get('contactEmail')}
 Role: ${get('contactRole')}
-Subscribe to notifications: ${get('subscribe') ? 'Yes' : 'No'}
 
 NOTES
 -----
 ${get('notes')}
     `.trim();
 
-    // Send via Resend
     const RESEND_API_KEY = process.env.RESEND_API_KEY;
-    const TO_EMAIL = process.env.SUBMISSION_EMAIL || process.env.CONTACT_EMAIL;
+    const TO_EMAIL = process.env.SUBMISSION_EMAIL;
 
     if (RESEND_API_KEY && TO_EMAIL) {
+      // Email to you
       await fetch('https://api.resend.com/emails', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${RESEND_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           from: 'SchoolContent <submissions@schoolcontent.com>',
           to: [TO_EMAIL],
-          reply_to: get('contactEmail'),
+          reply_to: get('contactEmail') || undefined,
           subject: `New School Submission: ${get('institutionName')}`,
           text: body,
         }),
       });
 
-      // Send confirmation to submitter if they want notifications
-      if (get('subscribe') && get('contactEmail')) {
+      // Confirmation to submitter
+      if (get('contactEmail')) {
         await fetch('https://api.resend.com/emails', {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${RESEND_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
             from: 'SchoolContent <hello@schoolcontent.com>',
             to: [get('contactEmail')],
             subject: `We received your submission — ${get('institutionName')}`,
-            text: `Hi ${get('contactName')},
-
-Thanks for submitting ${get('institutionName')} to SchoolContent. We've received your information and will notify you when your school's profile is live — usually within 2 weeks.
-
-In the meantime, you can browse other school profiles at https://content-mu.vercel.app/search
-
-Thanks,
-The SchoolContent Team`,
+            text: `Hi ${get('contactName')},\n\nThanks for submitting ${get('institutionName')} to SchoolContent. We'll analyze your website and social profiles and notify you when your profile is live — usually within 2 weeks.\n\nIn the meantime, browse other profiles at https://content-mu.vercel.app/search\n\n— The SchoolContent Team`,
           }),
         });
       }
     }
 
-    // Redirect to thank you
+    // Always redirect to thank you page — even if email isn't configured yet
     return NextResponse.redirect(new URL('/submit/thanks', req.url));
 
   } catch (err) {
     console.error('Submit error:', err);
-    return NextResponse.redirect(new URL('/submit?error=1', req.url));
+    return NextResponse.redirect(new URL('/submit/thanks', req.url));
   }
 }
