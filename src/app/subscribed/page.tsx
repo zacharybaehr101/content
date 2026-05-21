@@ -1,4 +1,6 @@
-export const metadata = { title: 'Subscribed — SchoolContent' };
+export const metadata = {
+  title: 'Subscribed — SchoolContent',
+};
 
 export default function SubscribedPage() {
   return (
