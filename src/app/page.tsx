@@ -22,7 +22,7 @@ export default async function HomePage() {
     <>
       {/* Hero */}
       <section style={{ position: 'relative', overflow: 'hidden' }}>
-        <div style={{ width: '100%', height: '420px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ width: '100%', height: '420px', position: 'relative', overflow: 'hidden', marginTop: '-1px' }}>
           <img src="/hero.png" alt="Catholic school campus with students" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(26,39,68,0.88) 40%, rgba(26,39,68,0.25) 100%)' }} />
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center' }}>
