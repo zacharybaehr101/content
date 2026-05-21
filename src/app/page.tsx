@@ -144,16 +144,7 @@ export default async function HomePage() {
                 border: '0.5px solid var(--border)',
                 borderRadius: 'var(--radius-lg)',
                 padding: '1.5rem',
-                transition: 'border-color 0.15s, box-shadow 0.15s',
                 textDecoration: 'none',
-              }}
-              onMouseEnter={e => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.borderColor = 'var(--navy)';
-              }}
-              onMouseLeave={e => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.borderColor = 'var(--border)';
               }}
               >
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
