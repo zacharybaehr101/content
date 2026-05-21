@@ -1,4 +1,3 @@
-
 export const metadata = {
   title: 'Get Access — SchoolContent',
   description: 'Sign up for SchoolContent to access Catholic school marketing intelligence.',
