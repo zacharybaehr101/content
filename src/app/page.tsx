@@ -21,33 +21,30 @@ export default async function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section style={{
-        background: 'var(--parchment)',
-        borderBottom: '1px solid var(--border)',
-        padding: '5rem 0 4rem',
-      }}>
-        <div className="container">
-          <div style={{ maxWidth: '680px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
-              <div style={{ width: '32px', height: '1px', background: 'var(--red)' }} />
-              <span style={{ fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--red)' }}>
-                Catholic School Intelligence
-              </span>
-            </div>
-            <h1 style={{ marginBottom: '1.25rem', fontStyle: 'italic', fontWeight: 400 }}>
-              See how the best Catholic schools<br />
-              <span style={{ fontWeight: 600, fontStyle: 'normal' }}>tell their story.</span>
-            </h1>
-            <p style={{ fontSize: '1.1rem', color: 'var(--ink-mid)', marginBottom: '2rem', maxWidth: '520px' }}>
-              Search, compare, and learn from the words, images, and messaging strategies of {totalSchools}+ Catholic schools — high schools and universities across the country.
-            </p>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              <a href="/search" className="btn btn-primary" style={{ fontSize: '0.78rem' }}>
-                Search the database →
-              </a>
-              <a href="/pricing" className="btn btn-outline" style={{ fontSize: '0.78rem' }}>
-                View pricing
-              </a>
+      <section style={{ position: 'relative', overflow: 'hidden' }}>
+        <div style={{ width: '100%', height: '420px', position: 'relative', overflow: 'hidden' }}>
+          <img src="/hero.png" alt="Catholic school campus with students" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(26,39,68,0.88) 40%, rgba(26,39,68,0.25) 100%)' }} />
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center' }}>
+            <div className="container">
+              <div style={{ maxWidth: '600px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.25rem' }}>
+                  <div style={{ width: '32px', height: '1px', background: 'var(--red)' }} />
+                  <span style={{ fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.8)' }}>
+                    Catholic School Intelligence
+                  </span>
+                </div>
+                <h1 style={{ marginBottom: '1.25rem', fontWeight: 600, color: '#fff', fontSize: 'clamp(1.8rem, 4vw, 3rem)', lineHeight: 1.15 }}>
+                  See how the best Catholic schools tell their story.
+                </h1>
+                <p style={{ fontSize: '1.05rem', color: 'rgba(255,255,255,0.85)', marginBottom: '2rem', maxWidth: '480px', lineHeight: 1.7 }}>
+                  Search, compare, and learn from the messaging strategies of {totalSchools > 0 ? `${totalSchools}+` : '100+'} Catholic schools.
+                </p>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                  <a href="/search" className="btn btn-primary" style={{ fontSize: '0.88rem', background: 'var(--red)', borderColor: 'var(--red)' }}>Search the database →</a>
+                  <a href="/pricing" style={{ fontSize: '0.88rem', fontWeight: 600, color: '#fff', padding: '10px 20px', border: '1.5px solid rgba(255,255,255,0.4)', borderRadius: 'var(--radius)', textDecoration: 'none' }}>View pricing</a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
