@@ -125,11 +125,11 @@ export default async function HomePage() {
       </section>
 
       {/* What's inside — 3 columns, tighter */}
-      <section style={{ padding: '3rem 0', background: 'var(--parchment-mid)', borderBottom: '1px solid var(--border)' }}>
+      <section style={{ padding: '3rem 0', background: 'var(--red)', borderBottom: '1px solid var(--border)' }}>
         <div className="container">
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.75rem' }}>
-            <h2 style={{ fontSize: '1.4rem', whiteSpace: 'nowrap' }}>Inside every profile</h2>
-            <div style={{ flex: 1, borderTop: '1px solid var(--border)' }} />
+            <h2 style={{ fontSize: '1.4rem', whiteSpace: 'nowrap', color: '#fff' }}>Inside every profile</h2>
+            <div style={{ flex: 1, borderTop: '1px solid rgba(255,255,255,0.3)' }} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
             {[
@@ -146,14 +146,16 @@ export default async function HomePage() {
                 items: ['Image theology & style', 'Mobile friction score', 'Founder\'s charism use', 'Financial aid signals', 'Social platform presence'],
               },
             ].map(({ label, items }) => (
-              <div key={label} style={{ background: 'var(--white)', border: '0.5px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.1rem 1.25rem' }}>
-                <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--red)', marginBottom: '0.75rem' }}>{label}</div>
+              <div key={label} style={{ background: 'rgba(255,255,255,0.12)', border: '0.5px solid rgba(255,255,255,0.2)', borderRadius: 'var(--radius-lg)', padding: '1.1rem 1.25rem' }}>
+                <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#fff', marginBottom: '0.75rem' }}>{label}</div>
                 {items.map(item => (
-                  <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '7px', fontSize: '0.88rem', color: 'var(--ink-mid)', padding: '4px 0', borderBottom: '0.5px solid var(--border-light)' }}>
-                    <span style={{ color: 'var(--navy)', fontSize: '0.65rem', fontWeight: 700 }}>✓</span>
+                  <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '7px', fontSize: '0.88rem', color: 'rgba(255,255,255,0.85)', padding: '4px 0', borderBottom: '0.5px solid rgba(255,255,255,0.15)' }}>
+                    <span style={{ color: '#fff', fontSize: '0.65rem', fontWeight: 700 }}>✓</span>
                     {item}
                   </div>
                 ))}
+              </div>
+            ))}
               </div>
             ))}
           </div>
@@ -226,15 +228,15 @@ export default async function HomePage() {
       </section>
 
       {/* CTA */}
-      <section style={{ padding: '4rem 0', textAlign: 'center', background: 'var(--white)' }}>
-        <div className="container" style={{ maxWidth: '520px' }}>
-          <h2 style={{ marginBottom: '0.75rem', fontSize: '1.75rem' }}>Ready to see what works?</h2>
-          <p style={{ marginBottom: '1.75rem', color: 'var(--ink-mid)', fontSize: '1rem' }}>
+      <section style={{ padding: '2rem 0', textAlign: 'center', background: '#2a2a2a' }}>
+        <div className="container" style={{ maxWidth: '560px' }}>
+          <h2 style={{ marginBottom: '0.5rem', fontSize: '1.35rem', color: '#fff' }}>Ready to see what works?</h2>
+          <p style={{ marginBottom: '1.1rem', color: 'rgba(255,255,255,0.65)', fontSize: '0.9rem' }}>
             Start free — 3 searches per month, no credit card required.
           </p>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/signup" className="btn btn-primary">Start for free →</a>
-            <a href="/pricing" className="btn btn-outline">See all plans</a>
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <a href="/signup" className="btn btn-primary" style={{ background: 'var(--red)', borderColor: 'var(--red)', fontSize: '0.85rem' }}>Start for free →</a>
+            <a href="/pricing" className="btn btn-outline" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)', fontSize: '0.85rem' }}>See all plans</a>
           </div>
         </div>
       </section>
