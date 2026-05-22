@@ -76,11 +76,11 @@ ${get('notes')}
       }
     }
 
-    // Always redirect to thank you page — even if email isn't configured yet
-    return NextResponse.redirect(new URL('/submit/thanks', req.url));
+    // Always redirect to thank you page — 303 required for HTML form POST redirects
+    return NextResponse.redirect(new URL('/submit/thanks', req.url), 303);
 
   } catch (err) {
     console.error('Submit error:', err);
-    return NextResponse.redirect(new URL('/submit/thanks', req.url));
+    return NextResponse.redirect(new URL('/submit/thanks', req.url), 303);
   }
 }
