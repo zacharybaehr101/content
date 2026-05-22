@@ -27,7 +27,7 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Hero — full width image, text flush left */}
+      {/* Hero - full width image, text flush left */}
       <section style={{ position: 'relative', overflow: 'hidden' }}>
         <div style={{ width: '100%', height: '460px', position: 'relative', overflow: 'hidden' }}>
           <img src="/hero.png" alt="Catholic school campus with students" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%' }} />
