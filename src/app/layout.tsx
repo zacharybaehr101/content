@@ -36,9 +36,24 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
 };
 
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {GA_ID && (
+          <>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
+            <script dangerouslySetInnerHTML={{ __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${GA_ID}', { page_path: window.location.pathname });
+            `}} />
+          </>
+        )}
+      </head>
       <body>
         <SiteHeader />
         <main>{children}</main>
@@ -63,15 +78,15 @@ function SiteHeader() {
 
   return (
     <header style={{ background: 'var(--navy)', borderBottom: '1px solid var(--navy-mid)', position: 'sticky', top: 0, zIndex: 100 }}>
-      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px', gap: '1rem' }}>
+      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px', gap: '0.5rem' }}>
         
         {/* Logo */}
-        <a href="/" style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', color: 'var(--parchment)', letterSpacing: '-0.01em', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', flexShrink: 0 }}>
+        <a href="/" style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', color: 'var(--parchment)', letterSpacing: '-0.01em', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', flexShrink: 0 }}>
           <span style={{ color: 'var(--ink-faint)', fontStyle: 'italic' }}>School</span>
           <span style={{ color: '#fff', fontWeight: 600 }}>Content</span>
         </a>
 
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '2px', flexWrap: 'wrap' }}>
+        <nav style={{ display: 'flex', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
           <a href="/search" style={navLinkStyle}>Search</a>
 
           {/* Browse dropdown */}
