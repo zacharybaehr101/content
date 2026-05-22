@@ -39,11 +39,11 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Always redirect to confirmation page
-    return NextResponse.redirect(new URL('/subscribed', req.url));
+    // Always redirect to confirmation page — 303 required for HTML form POST redirects
+    return NextResponse.redirect(new URL('/subscribed', req.url), 303);
 
   } catch (err) {
     console.error('Subscribe error:', err);
-    return NextResponse.redirect(new URL('/subscribed', req.url)); // Still show confirmation even if email fails
+    return NextResponse.redirect(new URL('/subscribed', req.url), 303);
   }
 }
