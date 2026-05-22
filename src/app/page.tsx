@@ -106,16 +106,18 @@ export default async function HomePage() {
               <a href="/search" className="btn btn-primary" style={{ marginTop: '0.5rem', fontSize: '0.88rem' }}>Start searching →</a>
             </div>
 
-            {/* Right: video embed */}
+            {/* Right: video */}
             <div>
-              <div style={{ position: 'relative', width: '100%', height: 0, paddingTop: '56.25%', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.12)' }}>
-                <iframe
-                  loading="lazy"
-                  style={{ position: 'absolute', width: '100%', height: '100%', top: 0, left: 0, border: 'none', padding: 0, margin: 0 }}
-                  src="https://www.canva.com/design/DAHKahszl2A/wfu0AWioApBXfmag8y6GLw/view?embed"
-                  allowFullScreen
-                  allow="fullscreen"
-                />
+              <div style={{ position: 'relative', width: '100%', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.12)' }}>
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  style={{ width: '100%', display: 'block', borderRadius: '10px' }}
+                >
+                  <source src="/home_page_embed.mp4" type="video/mp4" />
+                </video>
               </div>
             </div>
           </div>
