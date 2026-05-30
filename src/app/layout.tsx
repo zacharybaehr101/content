@@ -3,34 +3,34 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'SchoolContent — Catholic School Marketing Intelligence',
-    template: '%s — SchoolContent',
+    default: 'CampusVox — Digital Content Analysis for Catholic Schools',
+    template: '%s — CampusVox',
   },
-  description: 'Search, compare, and analyze how 100+ Catholic schools use their websites, social media, and news stories to promote enrollment. The definitive marketing intelligence database for Catholic school communications professionals.',
+  description: 'CampusVox is the digital content analysis platform for Catholic schools. Search, compare, and benchmark how 100+ Catholic high schools and universities use their websites, admissions pages, and social media to promote enrollment.',
   keywords: [
-    'Catholic school marketing',
+    'Catholic school digital content analysis',
+    'Catholic school marketing intelligence',
     'Catholic school communications',
-    'school enrollment marketing',
     'Catholic high school website analysis',
-    'Catholic university marketing intelligence',
-    'school admissions messaging',
-    'Catholic school branding',
-    'enrollment marketing benchmarking',
+    'Catholic university admissions messaging',
+    'school enrollment marketing benchmarking',
+    'Catholic school branding analysis',
+    'CampusVox',
   ],
-  authors: [{ name: 'SchoolContent' }],
-  creator: 'SchoolContent',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://content-mu.vercel.app'),
+  authors: [{ name: 'CampusVox' }],
+  creator: 'CampusVox',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://getcampusvox.com'),
   openGraph: {
     type: 'website',
-    siteName: 'SchoolContent',
-    title: 'SchoolContent — Catholic School Marketing Intelligence',
-    description: 'See how 100+ Catholic schools tell their story. Search hero headlines, CTAs, faith messaging, and strategic analysis across high schools and universities.',
+    siteName: 'CampusVox',
+    title: 'CampusVox — Digital Content Analysis for Catholic Schools',
+    description: 'Search, compare, and analyze how 100+ Catholic schools tell their story online. The definitive content analysis platform for Catholic school communicators.',
     locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SchoolContent — Catholic School Marketing Intelligence',
-    description: 'See how 100+ Catholic schools tell their story. Search, compare, and benchmark school marketing.',
+    title: 'CampusVox — Digital Content Analysis for Catholic Schools',
+    description: 'The digital content analysis platform for Catholic schools. Search, compare, and benchmark.',
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   alternates: { canonical: '/' },
@@ -79,11 +79,15 @@ function SiteHeader() {
   return (
     <header style={{ background: 'var(--navy)', borderBottom: '1px solid var(--navy-mid)', position: 'sticky', top: 0, zIndex: 100 }}>
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px', gap: '0.5rem' }}>
-        
+
         {/* Logo */}
-        <a href="/" style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', color: 'var(--parchment)', letterSpacing: '-0.01em', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', flexShrink: 0 }}>
-          <span style={{ color: 'var(--ink-faint)', fontStyle: 'italic' }}>School</span>
-          <span style={{ color: '#fff', fontWeight: 600 }}>Content</span>
+        <a href="/" style={{ display: 'flex', flexDirection: 'column', textDecoration: 'none', flexShrink: 0, gap: '1px' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: '#fff', fontWeight: 600, letterSpacing: '-0.01em', lineHeight: 1 }}>
+            Campus<span style={{ color: 'var(--red)' }}>Vox</span>
+          </span>
+          <span style={{ fontSize: '0.58rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-faint)', lineHeight: 1 }}>
+            Digital Content Analysis
+          </span>
         </a>
 
         <nav style={{ display: 'flex', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
@@ -95,17 +99,11 @@ function SiteHeader() {
               Browse ▾
             </button>
             <div className="dropdown-menu" style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              background: '#fff',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '6px',
-              minWidth: '200px',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-              zIndex: 200,
-              display: 'none',
+              position: 'absolute', top: '100%', left: 0,
+              background: '#fff', border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-lg)', padding: '6px',
+              minWidth: '210px', boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              zIndex: 200, display: 'none',
             }}>
               {[
                 { label: 'All Schools', href: '/search', desc: 'Homepage analysis' },
@@ -115,7 +113,7 @@ function SiteHeader() {
               ].map(({ label, href, desc }) => (
                 <a key={href} href={href} style={{ display: 'block', padding: '8px 12px', borderRadius: 'var(--radius)', textDecoration: 'none', marginBottom: '2px' }}>
                   <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--navy)' }}>{label}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--ink-light)' }}>{desc}</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--ink-light)' }}>{desc}</div>
                 </a>
               ))}
             </div>
@@ -127,7 +125,6 @@ function SiteHeader() {
         </nav>
       </div>
 
-      {/* Dropdown CSS — pure CSS hover, no JS needed */}
       <style>{`
         .browse-dropdown:hover .dropdown-menu { display: block !important; }
         .dropdown-menu a:hover { background: var(--parchment-mid); }
@@ -140,22 +137,27 @@ function SiteFooter() {
   return (
     <footer style={{ background: 'var(--navy)', borderTop: '1px solid var(--navy-mid)', padding: '3rem 0', marginTop: '6rem' }}>
       <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '2rem', flexWrap: 'wrap' }}>
-        <div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--parchment)', marginBottom: '8px' }}>
-            <span style={{ color: 'var(--ink-faint)', fontStyle: 'italic' }}>School</span>
-            <span style={{ color: '#fff', fontWeight: 600 }}>Content</span>
+        <div style={{ maxWidth: '300px' }}>
+          {/* Logo */}
+          <div style={{ marginBottom: '10px' }}>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: '#fff', fontWeight: 600 }}>
+              Campus<span style={{ color: 'var(--red)' }}>Vox</span>
+            </span>
           </div>
-          <p style={{ fontSize: '0.85rem', color: 'var(--ink-faint)', maxWidth: '280px', lineHeight: 1.6 }}>
-            Catholic school marketing intelligence — see how the best schools tell their story.
+          <p style={{ fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-faint)', marginBottom: '8px' }}>
+            Digital Content Analysis for Catholic Schools
           </p>
-          {/* Email signup */}
-          <form action="/api/subscribe" method="POST" style={{ marginTop: '1rem', display: 'flex', gap: '6px' }}>
-            <input type="email" name="email" placeholder="Your email" required style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 'var(--radius)', padding: '8px 12px', fontSize: '0.85rem', color: '#fff', fontFamily: 'var(--font-body)', width: '200px' }} />
-            <button type="submit" style={{ background: 'var(--red)', color: '#fff', border: 'none', borderRadius: 'var(--radius)', padding: '8px 14px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--ink-faint)', lineHeight: 1.65, marginBottom: '1.25rem' }}>
+            Search, compare, and benchmark how Catholic schools tell their story online.
+          </p>
+          <form action="/api/subscribe" method="POST" style={{ display: 'flex', gap: '6px' }}>
+            <input type="email" name="email" placeholder="Your email" required style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 'var(--radius)', padding: '8px 12px', fontSize: '0.85rem', color: '#fff', fontFamily: 'var(--font-body)', width: '185px' }} />
+            <button type="submit" style={{ background: 'var(--red)', color: '#fff', border: 'none', borderRadius: 'var(--radius)', padding: '8px 14px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-body)', whiteSpace: 'nowrap' }}>
               Subscribe
             </button>
           </form>
         </div>
+
         <div style={{ display: 'flex', gap: '3rem', flexWrap: 'wrap' }}>
           {[
             { heading: 'Browse', links: [
@@ -171,7 +173,7 @@ function SiteFooter() {
             ]},
           ].map(({ heading, links }) => (
             <div key={heading}>
-              <p style={{ fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-faint)', marginBottom: '10px' }}>{heading}</p>
+              <p style={{ fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-faint)', marginBottom: '10px' }}>{heading}</p>
               {links.map(l => (
                 <a key={l.label} href={l.href} style={{ display: 'block', fontSize: '0.88rem', color: 'var(--parchment-dark)', marginBottom: '6px', textDecoration: 'none' }}>{l.label}</a>
               ))}
@@ -179,8 +181,10 @@ function SiteFooter() {
           ))}
         </div>
       </div>
-      <div className="container" style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '0.5px solid rgba(255,255,255,0.1)' }}>
-        <p style={{ fontSize: '0.78rem', color: 'var(--ink-faint)' }}>© {new Date().getFullYear()} SchoolContent. All rights reserved.</p>
+
+      <div className="container" style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '0.5px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <p style={{ fontSize: '0.78rem', color: 'var(--ink-faint)' }}>© {new Date().getFullYear()} CampusVox. All rights reserved.</p>
+        <p style={{ fontSize: '0.72rem', color: 'var(--ink-faint)' }}>getcampusvox.com</p>
       </div>
     </footer>
   );
