@@ -53,7 +53,7 @@ ${get('notes')}
         method: 'POST',
         headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: 'SchoolContent <submissions@schoolcontent.com>',
+          from: 'onboarding@resend.dev',
           to: [TO_EMAIL],
           reply_to: get('contactEmail') || undefined,
           subject: `New School Submission: ${get('institutionName')}`,
@@ -67,7 +67,7 @@ ${get('notes')}
           method: 'POST',
           headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            from: 'SchoolContent <hello@schoolcontent.com>',
+            from: 'onboarding@resend.dev',
             to: [get('contactEmail')],
             subject: `We received your submission — ${get('institutionName')}`,
             text: `Hi ${get('contactName')},\n\nThanks for submitting ${get('institutionName')} to SchoolContent. We'll analyze your website and social profiles and notify you when your profile is live — usually within 2 weeks.\n\nIn the meantime, browse other profiles at https://content-mu.vercel.app/search\n\n— The SchoolContent Team`,
