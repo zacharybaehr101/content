@@ -149,74 +149,122 @@ a:hover { color: var(--red); }
    MOBILE RESPONSIVE
    ===================== */
 
-/* Nav — collapse on mobile */
 @media (max-width: 768px) {
-  /* Container padding */
   .container { padding: 0 1rem; }
 
-  /* Header nav — hide text links, keep CTAs */
-  header nav a:not([href="/login"]):not([href="/signup"]) {
-    display: none;
+  /* Header — stack logo + nav */
+  header .container {
+    height: auto !important;
+    padding: 0.75rem 1rem !important;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
-  /* Hero text */
-  h1 { font-size: clamp(1.6rem, 6vw, 2.5rem); }
-  h2 { font-size: clamp(1.2rem, 4vw, 1.8rem); }
+  /* Hide browse dropdown and text nav on mobile, keep CTAs */
+  header nav .browse-dropdown,
+  header nav a[href="/search"],
+  header nav a[href="/pricing"] {
+    display: none !important;
+  }
 
-  /* Search page — stack filters vertically */
-  .search-filters { flex-direction: column; }
+  /* Hero section — reduce height, adjust padding */
+  section div[style*="height: 460px"] {
+    height: 520px !important;
+  }
 
-  /* School profile — stack sidebar below main */
-  .profile-grid {
+  /* Hero text column — full width on mobile */
+  .container > div[style*="width: 65%"] {
+    width: 100% !important;
+    maxWidth: 100% !important;
+    paddingTop: 80px !important;
+  }
+
+  /* Typography scale down */
+  h1 { font-size: clamp(1.5rem, 5vw, 2rem) !important; }
+  h2 { font-size: clamp(1.15rem, 4vw, 1.5rem) !important; }
+  h3 { font-size: 1rem !important; }
+
+  /* Two-column grids → single column */
+  .profile-grid,
+  div[style*="grid-template-columns: 1fr 1fr"],
+  div[style*="gridTemplateColumns: '1fr 1fr'"] {
     grid-template-columns: 1fr !important;
   }
 
-  /* Deep analysis sub-fields — stack vertically */
-  .deep-sub-grid {
+  /* Three-column grids → single column */
+  div[style*="repeat(3, 1fr)"] {
     grid-template-columns: 1fr !important;
   }
 
-  /* School cards — single column */
-  .school-grid {
+  /* Auto-fit grids → single column */
+  div[style*="minmax(300px"] {
+    grid-template-columns: 1fr !important;
+  }
+  div[style*="minmax(340px"] {
     grid-template-columns: 1fr !important;
   }
 
-  /* Stats bar — 2 columns */
-  .stats-bar {
+  /* Stats bar — 2x2 grid */
+  div[style*="gap: '2.5rem'"] {
     display: grid !important;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.25rem;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1.25rem !important;
   }
 
-  /* Pricing grid — single column */
-  .pricing-grid {
+  /* Footer — stack vertically */
+  footer > div.container:first-child {
+    flex-direction: column !important;
+  }
+  footer div[style*="maxWidth: '300px'"] {
+    max-width: 100% !important;
+  }
+
+  /* Pricing grid → single column */
+  div[style*="minmax(200px"] {
     grid-template-columns: 1fr !important;
   }
 
-  /* What's in database — 2 col on mobile */
-  .features-grid {
-    grid-template-columns: 1fr 1fr !important;
+  /* Search page filter selects — wrap */
+  form div[style*="gap: '8px'"] {
+    flex-wrap: wrap !important;
   }
 
-  /* DataRow — stack label above value */
-  .data-row {
-    flex-direction: column !important;
-    align-items: flex-start !important;
+  /* Submit form two-col → single */
+  div[style*="grid-template-columns: '1fr 360px'"],
+  div[style*="gridTemplateColumns: '1fr 360px'"] {
+    grid-template-columns: 1fr !important;
   }
 
-  /* Buttons — full width on mobile */
-  .btn-group { flex-direction: column; width: 100%; }
-  .btn-group .btn { width: 100%; justify-content: center; }
-
-  /* Header height */
-  header .container { height: auto; padding: 1rem; flex-wrap: wrap; gap: 0.75rem; }
-
-  /* Footer */
-  footer .container { flex-direction: column; }
+  /* Tabs on profile page */
+  div[style*="display: 'flex'"][style*="gap: '4px'"] {
+    flex-wrap: wrap !important;
+  }
 }
 
 @media (max-width: 480px) {
-  h1 { font-size: 1.5rem; }
-  .features-grid { grid-template-columns: 1fr !important; }
-  .tag { font-size: 0.6rem !important; }
+  h1 { font-size: 1.4rem !important; }
+  h2 { font-size: 1.1rem !important; }
+
+  .tag { font-size: 0.6rem !important; padding: 2px 5px !important; }
+
+  /* Sidebar on profile → move above on very small screens */
+  .profile-grid > div:last-child {
+    order: -1;
+  }
+
+  /* Buttons full width on small screens */
+  .btn { width: 100%; justify-content: center; }
+
+  /* Pricing cards side by side at 480 */
+  div[style*="minmax(200px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Footer email form — stack */
+  form[action="/api/subscribe"] {
+    flex-direction: column !important;
+  }
+  form[action="/api/subscribe"] input {
+    width: 100% !important;
+  }
 }
