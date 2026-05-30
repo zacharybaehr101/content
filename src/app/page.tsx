@@ -1,4 +1,4 @@
-import { fetchAllSchools, fetchFilterOptions, fetchAdmissionsData } from '@/lib/sheets';
+import { fetchAllSchools, fetchFilterOptions } from '@/lib/sheets';
 import { School } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
@@ -17,34 +17,33 @@ export default async function HomePage() {
   const highSchools = schools.filter(s => s.type?.includes('High School')).length;
   const universities = schools.filter(s => s.type?.includes('University')).length;
 
-  // Featured: pick 3 schools with good data spread
   const withHeadline = schools.filter(s => s.heroHeadline && s.heroHeadline.length > 10);
   const featured = [
     withHeadline[2] ?? schools[2],
     withHeadline[5] ?? schools[5],
     withHeadline[10] ?? schools[10],
-  ].filter(Boolean);
+  ].filter(Boolean) as School[];
 
   return (
     <>
-      {/* Hero - full width image, text flush left */}
+      {/* Hero */}
       <section style={{ position: 'relative', overflow: 'hidden' }}>
         <div style={{ width: '100%', height: '460px', position: 'relative', overflow: 'hidden' }}>
           <img src="/hero.png" alt="Catholic school campus with students" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(26,39,68,0.92) 45%, rgba(26,39,68,0.15) 100%)' }} />
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center' }}>
             <div style={{ paddingLeft: 'max(2rem, calc((100vw - 1200px) / 2 + 2rem))', maxWidth: '620px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
-                <div style={{ width: '32px', height: '1px', background: 'var(--red)' }} />
-                <span style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.75)' }}>
-                  Catholic School Intelligence
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.75rem' }}>
+                <div style={{ width: '28px', height: '1px', background: 'var(--red)' }} />
+                <span style={{ fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)' }}>
+                  Digital Content Analysis for Catholic Schools
                 </span>
               </div>
               <h1 style={{ marginBottom: '1rem', fontWeight: 600, color: '#fff', fontSize: 'clamp(1.9rem, 3.5vw, 3rem)', lineHeight: 1.1 }}>
-                See how the best Catholic schools tell their story.
+                Every school has a voice.<br />We audit the echo.
               </h1>
               <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.82)', marginBottom: '1.75rem', maxWidth: '460px', lineHeight: 1.7 }}>
-                Search, compare, and learn from the messaging strategies of {totalSchools > 0 ? `${totalSchools}+` : '100+'} Catholic schools.
+                Search, compare, and benchmark how {totalSchools > 0 ? `${totalSchools}+` : '100+'} Catholic schools tell their story online.
               </p>
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                 <a href="/search" className="btn btn-primary" style={{ fontSize: '0.88rem', background: 'var(--red)', borderColor: 'var(--red)' }}>Search the database →</a>
@@ -75,11 +74,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Sub-hero: Search. Compare. Learn. + Video */}
+      {/* Search. Compare. Learn. + Video */}
       <section style={{ padding: '3.5rem 0', background: 'var(--white)', borderBottom: '1px solid var(--border)' }}>
         <div className="container">
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }}>
-            {/* Left: value props */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.25rem' }}>
                 <div style={{ width: '28px', height: '1px', background: 'var(--red)' }} />
@@ -91,7 +89,7 @@ export default async function HomePage() {
               {[
                 { icon: '🔍', label: 'Search', desc: 'Find any Catholic school by name, phrase, religious order, region, or messaging style.' },
                 { icon: '⚖️', label: 'Compare', desc: 'See how schools differ in faith posture, belonging language, CTA strategy, and visual theology.' },
-                { icon: '💡', label: 'Learn', desc: 'Read full narrative analysis and apply what works to your own school\'s communications.' },
+                { icon: '💡', label: 'Learn', desc: "Read full narrative analysis and apply what works to your own school's communications." },
               ].map(({ icon, label, desc }) => (
                 <div key={label} style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
                   <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: 'var(--navy-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', flexShrink: 0 }}>
@@ -105,17 +103,9 @@ export default async function HomePage() {
               ))}
               <a href="/search" className="btn btn-primary" style={{ marginTop: '0.5rem', fontSize: '0.88rem' }}>Start searching →</a>
             </div>
-
-            {/* Right: video */}
             <div>
               <div style={{ position: 'relative', width: '100%', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.12)' }}>
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  style={{ width: '100%', display: 'block', borderRadius: '10px' }}
-                >
+                <video autoPlay loop muted playsInline style={{ width: '100%', display: 'block', borderRadius: '10px' }}>
                   <source src="/home_page_embed.mp4" type="video/mp4" />
                 </video>
               </div>
@@ -124,8 +114,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* What's inside — 3 columns, tighter */}
-      <section style={{ padding: '3rem 0', background: 'var(--red)', borderBottom: '1px solid var(--border)' }}>
+      {/* Inside every profile */}
+      <section style={{ padding: '3rem 0', background: 'var(--red)' }}>
         <div className="container">
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.75rem' }}>
             <h2 style={{ fontSize: '1.4rem', whiteSpace: 'nowrap', color: '#fff' }}>Inside every profile</h2>
@@ -133,18 +123,9 @@ export default async function HomePage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
             {[
-              {
-                label: 'Website & Copy',
-                items: ['Hero headlines (verbatim)', 'CTA labels & placement', 'Nav structure', 'Admissions language', 'Faith identity posture'],
-              },
-              {
-                label: 'Messaging Intelligence',
-                items: ['Audience focus', 'Belonging vs. prestige signals', 'Strongest phrases', 'Key phrase collection', 'Narrative full analysis'],
-              },
-              {
-                label: 'Visual & Strategy',
-                items: ['Image theology & style', 'Mobile friction score', 'Founder\'s charism use', 'Financial aid signals', 'Social platform presence'],
-              },
+              { label: 'Website & Copy', items: ['Hero headlines (verbatim)', 'CTA labels & placement', 'Nav structure', 'Admissions language', 'Faith identity posture'] },
+              { label: 'Messaging Intelligence', items: ['Audience focus', 'Belonging vs. prestige signals', 'Strongest phrases', 'Key phrase collection', 'Narrative full analysis'] },
+              { label: 'Visual & Strategy', items: ['Image theology & style', 'Mobile friction score', "Founder's charism use", 'Financial aid signals', 'Social platform presence'] },
             ].map(({ label, items }) => (
               <div key={label} style={{ background: 'rgba(255,255,255,0.12)', border: '0.5px solid rgba(255,255,255,0.2)', borderRadius: 'var(--radius-lg)', padding: '1.1rem 1.25rem' }}>
                 <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#fff', marginBottom: '0.75rem' }}>{label}</div>
@@ -156,13 +137,11 @@ export default async function HomePage() {
                 ))}
               </div>
             ))}
-              </div>
-            ))}
           </div>
         </div>
       </section>
 
-      {/* Featured profiles — rotate through homepage, admissions, linkedin */}
+      {/* Sample profiles */}
       <section style={{ padding: '3rem 0 4rem', background: 'var(--parchment)' }}>
         <div className="container">
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem', marginBottom: '1.75rem' }}>
@@ -171,7 +150,6 @@ export default async function HomePage() {
             <a href="/search" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--red)', whiteSpace: 'nowrap', textDecoration: 'none' }}>View all →</a>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.1rem' }}>
-            {/* Homepage profile card */}
             {featured[0] && (
               <a href={`/school/${featured[0].id}`} style={{ display: 'block', background: 'var(--white)', border: '0.5px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.35rem', textDecoration: 'none' }}>
                 <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
@@ -190,8 +168,6 @@ export default async function HomePage() {
                 </div>
               </a>
             )}
-
-            {/* Admissions card */}
             {featured[1] && (
               <a href={`/school/${featured[1].id}?tab=admissions`} style={{ display: 'block', background: 'var(--white)', border: '0.5px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.35rem', textDecoration: 'none' }}>
                 <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
@@ -210,8 +186,6 @@ export default async function HomePage() {
                 </div>
               </a>
             )}
-
-            {/* LinkedIn coming soon card */}
             <a href="/linkedin" style={{ display: 'block', background: 'var(--navy)', border: '0.5px solid var(--navy)', borderRadius: 'var(--radius-lg)', padding: '1.35rem', textDecoration: 'none' }}>
               <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
                 <span style={{ fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', background: 'rgba(255,255,255,0.15)', color: '#fff', padding: '2px 7px', borderRadius: '3px' }}>LinkedIn</span>
