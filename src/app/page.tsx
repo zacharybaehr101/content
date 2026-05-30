@@ -32,22 +32,25 @@ export default async function HomePage() {
           <img src="/hero.png" alt="Catholic school campus with students" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(26,39,68,0.92) 45%, rgba(26,39,68,0.15) 100%)' }} />
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center' }}>
-            <div style={{ paddingLeft: 'max(2rem, calc((100vw - 1200px) / 2 + 2rem))', maxWidth: '620px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.75rem' }}>
-                <div style={{ width: '28px', height: '1px', background: 'var(--red)' }} />
-                <span style={{ fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)' }}>
+            <div style={{ paddingLeft: 'max(2rem, calc((100vw - 1200px) / 2 + 2rem))', maxWidth: '580px' }}>
+              {/* CampusVox brand in hero */}
+              <div style={{ marginBottom: '0.75rem' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem, 4vw, 3.25rem)', color: '#fff', fontWeight: 600, letterSpacing: '-0.01em', lineHeight: 1 }}>
+                  Campus<span style={{ color: 'var(--red)' }}>Vox</span>
+                </div>
+                <div style={{ fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginTop: '4px' }}>
                   Digital Content Analysis for Catholic Schools
-                </span>
+                </div>
               </div>
-              <h1 style={{ marginBottom: '1rem', fontWeight: 600, color: '#fff', fontSize: 'clamp(1.9rem, 3.5vw, 3rem)', lineHeight: 1.1 }}>
+              <h1 style={{ marginBottom: '0.85rem', fontWeight: 600, color: '#fff', fontSize: 'clamp(1.4rem, 2.5vw, 2rem)', lineHeight: 1.2 }}>
                 Every school has a voice.<br />We audit the echo.
               </h1>
-              <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.82)', marginBottom: '1.75rem', maxWidth: '460px', lineHeight: 1.7 }}>
+              <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.8)', marginBottom: '1.5rem', maxWidth: '420px', lineHeight: 1.65 }}>
                 Search, compare, and benchmark how {totalSchools > 0 ? `${totalSchools}+` : '100+'} Catholic schools tell their story online.
               </p>
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                <a href="/search" className="btn btn-primary" style={{ fontSize: '0.88rem', background: 'var(--red)', borderColor: 'var(--red)' }}>Search the database →</a>
-                <a href="/pricing" style={{ fontSize: '0.88rem', fontWeight: 600, color: '#fff', padding: '10px 20px', border: '1.5px solid rgba(255,255,255,0.35)', borderRadius: 'var(--radius)', textDecoration: 'none' }}>View pricing</a>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <a href="/search" className="btn btn-primary" style={{ fontSize: '0.85rem', background: 'var(--red)', borderColor: 'var(--red)' }}>Search the database →</a>
+                <a href="/pricing" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fff', padding: '9px 18px', border: '1.5px solid rgba(255,255,255,0.35)', borderRadius: 'var(--radius)', textDecoration: 'none' }}>View pricing</a>
               </div>
             </div>
           </div>
