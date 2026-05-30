@@ -34,6 +34,10 @@ export const metadata: Metadata = {
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   alternates: { canonical: '/' },
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+  },
 };
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
@@ -81,12 +85,12 @@ function SiteHeader() {
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px', gap: '0.5rem' }}>
 
         {/* Logo */}
-        <a href="/" style={{ display: 'flex', flexDirection: 'column', textDecoration: 'none', flexShrink: 0, gap: '1px' }}>
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: '#fff', fontWeight: 600, letterSpacing: '-0.01em', lineHeight: 1 }}>
+        <a href="/" style={{ display: 'flex', flexDirection: 'column', textDecoration: 'none', flexShrink: 0, gap: '2px' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: '#fff', fontWeight: 600, letterSpacing: '-0.01em', lineHeight: 1 }}>
             Campus<span style={{ color: 'var(--red)' }}>Vox</span>
           </span>
-          <span style={{ fontSize: '0.58rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-faint)', lineHeight: 1 }}>
-            Digital Content Analysis
+          <span style={{ fontSize: '0.55rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-faint)', lineHeight: 1 }}>
+            Digital Content Analysis for Catholic Schools
           </span>
         </a>
 
