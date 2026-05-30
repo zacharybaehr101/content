@@ -32,7 +32,7 @@ export default async function HomePage() {
           <img src="/hero.png" alt="Catholic school campus with students" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(26,39,68,0.92) 45%, rgba(26,39,68,0.15) 100%)' }} />
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center' }}>
-            <div style={{ paddingLeft: 'max(2rem, calc((100vw - 1200px) / 2 + 2rem))', maxWidth: '780px', width: '65%', paddingTop: '50px', paddingBottom: '50px' }}>
+            <div style={{ paddingLeft: 'max(2rem, calc((100vw - 1200px) / 2 + 2rem))', maxWidth: '780px', width: '65%', paddingTop: '150px', paddingBottom: '50px' }}>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(3rem, 6vw, 5.5rem)', color: '#fff', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1 }}>
                 Campus<span style={{ color: 'var(--red)' }}>Vox</span>
               </div>
@@ -42,7 +42,13 @@ export default async function HomePage() {
               <p style={{ fontSize: 'clamp(0.9rem, 1.4vw, 1.05rem)', color: 'rgba(255,255,255,0.8)', marginBottom: '1.75rem', maxWidth: '540px', lineHeight: 1.7 }}>
                 Search, compare, and benchmark how {totalSchools > 0 ? `${totalSchools}+` : '100+'} Catholic schools tell their story online.
               </p>
-              <a href="/search" className="btn btn-primary" style={{ fontSize: '0.9rem', background: 'var(--red)', borderColor: 'var(--red)' }}>Search the database →</a>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <a href="/search" className="btn btn-primary" style={{ fontSize: '0.9rem', background: 'var(--red)', borderColor: 'var(--red)' }}>Search the database →</a>
+                <a href="https://www.linkedin.com/company/campusvox/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', fontSize: '0.85rem', fontWeight: 600, color: 'rgba(255,255,255,0.8)', textDecoration: 'none', padding: '9px 16px', border: '1.5px solid rgba(255,255,255,0.3)', borderRadius: 'var(--radius)' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                  Follow on LinkedIn
+                </a>
+              </div>
             </div>
           </div>
         </div>
