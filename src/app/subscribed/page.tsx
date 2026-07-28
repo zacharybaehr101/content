@@ -1,6 +1,4 @@
-export const metadata = {
-  title: 'Subscribed — SchoolContent',
-};
+export const metadata = { title: 'Subscribed — CampusVox' };
 
 export default function SubscribedPage() {
   return (
@@ -9,7 +7,7 @@ export default function SubscribedPage() {
         <div style={{ fontSize: '3.5rem', marginBottom: '1.5rem' }}>✉️</div>
         <h1 style={{ fontSize: '2rem', marginBottom: '1rem', fontWeight: 600 }}>You&apos;re on the list</h1>
         <p style={{ fontSize: '1rem', color: 'var(--ink-mid)', lineHeight: 1.75, marginBottom: '2rem' }}>
-          Thanks for subscribing. We&apos;ll send you updates when new schools are added, new analysis is published, and new features launch.
+          Thanks for signing up. We&apos;ll be in touch with access details and updates when new schools and features are added.
         </p>
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <a href="/search" className="btn btn-primary">Browse all schools →</a>

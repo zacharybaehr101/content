@@ -1,7 +1,4 @@
-
-export const metadata = {
-  title: 'Thank You — SchoolContent',
-};
+export const metadata = { title: 'Thank You — CampusVox' };
 
 export default function SubmitThanksPage() {
   return (
@@ -14,7 +11,7 @@ export default function SubmitThanksPage() {
         </p>
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <a href="/search" className="btn btn-primary">Browse all schools →</a>
-          <a href="/admissions" className="btn btn-outline">View admissions pages</a>
+          <a href="/admissions" className="btn btn-outline">Admissions pages</a>
         </div>
       </div>
     </div>
