@@ -1,13 +1,13 @@
-name: Auto Crop and Resize Artwork
+name: Auto Crop, Analyze, and Organize Website Artwork
 
 on:
   push:
     paths:
-      - 'ready-to-scan/**' # Triggers whenever files in ready-to-scan change
-  workflow_dispatch: # Allows manual trigger from the GitHub Actions tab
+      - 'ready-to-scan/**'
+  workflow_dispatch:
 
 permissions:
-  contents: write # Grants GitHub permission to commit processed images back to repo
+  contents: write
 
 jobs:
   process-images:
@@ -27,11 +27,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Image Processing Script
+      - name: Run Image Processing & Gemini Analysis
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python process_images.py
 
-      - name: Commit and Push Processed Artwork
+      - name: Commit and Push All Changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "auto: crop & optimize website artwork"
-          file_pattern: "ready-to-scan/** website-artwork/**"
+          commit_message: "auto: crop, analyze with Gemini, and move completed screenshots"
+          file_pattern: "ready-to-scan/** website-artwork/** scanned/**"
