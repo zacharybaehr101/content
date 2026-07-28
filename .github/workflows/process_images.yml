@@ -1,0 +1,37 @@
+name: Auto Crop and Resize Artwork
+
+on:
+  push:
+    paths:
+      - 'ready-to-scan/**' # Triggers whenever files in ready-to-scan change
+  workflow_dispatch: # Allows manual trigger from the GitHub Actions tab
+
+permissions:
+  contents: write # Grants GitHub permission to commit processed images back to repo
+
+jobs:
+  process-images:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Image Processing Script
+        run: python process_images.py
+
+      - name: Commit and Push Processed Artwork
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "auto: crop & optimize website artwork"
+          file_pattern: "ready-to-scan/** website-artwork/**"
