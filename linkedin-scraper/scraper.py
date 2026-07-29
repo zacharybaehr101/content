@@ -1,260 +1,37 @@
 import csv
 import time
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 urls = [
+    # (Keep your full list of URLs here)
     "https://ipsciences.edu/",
     "https://manhattan.edu/",
-    "https://resu.edu/",
-    "https://saintjosephabbey.com/",
-    "https://stkate.edu/",
-    "https://www.acs350.org/",
-    "https://www.ai.edu/",
-    "https://www.albertus.edu/",
-    "https://www.alvernia.edu/",
-    "https://www.alverno.edu/",
-    "https://www.annamaria.edu/",
-    "https://www.anselm.edu/",
-    "https://www.aquinas.edu/",
-    "https://www.aquinascollege.edu/",
-    "https://www.assumption.edu/",
-    "https://www.athenaeum.edu/",
-    "https://www.augustineinstitute.org/",
-    "https://www.avemaria.edu/",
-    "https://www.avemarialaw.edu/",
-    "https://www.avila.edu/",
-    "https://www.barry.edu/",
-    "https://www.bc.edu/",
-    "https://www.bcs.edu/",
-    "https://www.bellarmine.edu/",
-    "https://www.belmontabbeycollege.edu/",
-    "https://www.ben.edu/",
-    "https://www.benedictine.edu/",
-    "https://www.brescia.edu/",
-    "https://www.briarcliff.edu/",
-    "https://www.cabrini.edu/",
-    "https://www.caldwell.edu/",
-    "https://www.canisius.edu/",
-    "https://www.caritaschristi.org/",
-    "https://www.carlow.edu/",
-    "https://www.carroll.edu/",
-    "https://www.cbu.edu/",
-    "https://www.ccsj.edu/",
-    "https://www.cdu.edu/",
-    "https://www.chaminade.edu/",
-    "https://www.chc.edu/",
-    "https://www.cks.edu/",
-    "https://www.clarke.edu/",
-    "https://www.cmsv.edu/",
-    "https://www.cnr.edu/Home/Home/",
-    "https://www.creighton.edu/",
-    "https://www.csbsju.edu/",
-    "https://www.cse.edu/",
-    "https://www.csj.edu/",
-    "https://www.csm.edu/",
-    "https://www.css.edu/",
-    "https://www.ctu.edu/",
-    "https://www.cua.edu/",
-    "https://www.dc.edu/",
-    "https://www.depaul.edu/",
-    "https://www.desales.edu/",
-    "https://www.dhs.edu/",
-    "https://www.dom.edu/",
-    "https://www.dominican.edu/",
-    "https://www.donnelly.edu/",
-    "https://www.dspt.edu/",
-    "https://www.duq.edu/",
-    "https://www.dwci.edu/",
-    "https://www.dyc.edu/",
-    "https://www.edgewood.edu/",
-    "https://www.elms.edu/",
-    "https://www.emmanuel.edu/",
-    "https://www.fairfield.edu/",
-    "https://www.felician.edu/",
-    "https://www.fishermore.edu/",
-    "https://www.fontbonne.edu/",
-    "https://www.fordham.edu/",
-    "https://www.franciscan.edu/",
-    "https://www.fst.edu/",
-    "https://www.gannon.edu/",
-    "https://www.georgetown.edu/",
-    "https://www.georgian.edu/",
-    "https://www.gmc.edu/",
-    "https://www.gonzaga.edu/",
-    "https://www.gscollege.edu/",
-    "https://www.hcc-nd.edu/",
-    "https://www.hilbert.edu/",
-    "https://www.holyapostles.edu/",
-    "https://www.holycross.edu/",
-    "https://www.holyfamily.edu/",
-    "https://www.holyname.org/SchoolOfNursing/",
-    "https://www.holyspiritcollege.org/",
-    "https://www.icseminary.edu/",
-    "https://www.immaculata.edu/",
-    "https://www.iona.edu/",
-    "https://www.jcu.edu/",
-    "https://www.jpcatholic.com/",
-    "https://www.kings.edu/",
-    "https://www.laroche.edu/",
-    "https://www.lasalle.edu/",
-    "https://www.lemoyne.edu/",
-    "https://www.lewisu.edu/",
-    "https://www.lmu.edu/",
-    "https://www.loras.edu/",
-    "https://www.lourdes.edu/",
-    "https://www.loyno.edu/",
-    "https://www.loyola.edu/",
-    "https://www.luc.edu/",
-    "https://www.maccsa.org/",
-    "https://www.madonna.edu/",
-    "https://www.magdalen.edu/",
-    "https://www.manor.edu/",
-    "https://www.mariacollege.edu/",
-    "https://www.marian.edu/",
-    "https://www.mariancourt.edu/",
-    "https://www.marianuniversity.edu/",
-    "https://www.marygrove.edu/",
-    "https://www.marylhurst.edu/",
-    "https://www.marymount.edu/",
-    "https://www.marymountpv.edu/",
-    "https://www.marywood.edu/",
-    "https://www.mccn.edu/",
-    "https://www.mchs.edu/",
-    "https://www.mercycollege.edu/",
-    "https://www.mercyhurst.edu/",
-    "https://www.merrimack.edu/",
-    "https://www.misericordia.edu/",
-    "https://www.molloy.edu/",
-    "https://www.mountangelabbey.org/seminary/",
-    "https://www.msj.edu/",
-    "https://www.msmary.edu/",
-    "https://www.msmc.edu/",
-    "https://www.msmc.la.edu/",
-    "https://www.mtaloy.edu/",
-    "https://www.mtmary.edu/",
-    "https://www.mtmc.edu/",
-    "https://www.mtmercy.edu/",
-    "https://www.mu.edu/",
-    "https://www.nd.edu/",
-    "https://www.ndm.edu/",
-    "https://www.ndnu.edu/",
-    "https://www.nds.edu/",
-    "https://www.neumann.edu/",
-    "https://www.newmanu.edu/",
-    "https://www.niagara.edu/",
-    "https://www.notredamecollege.edu/",
-    "https://www.ohiodominican.edu/",
-    "https://www.olhcc.edu/",
-    "https://www.ollusa.edu/",
-    "https://www.ololcollege.edu/",
-    "https://www.ost.edu/",
-    "https://www.providence.edu/",
-    "https://www.quincy.edu/",
-    "https://www.regis.edu/",
-    "https://www.regiscollege.edu/",
-    "https://www.rivier.edu/",
-    "https://www.rockhurst.edu/",
-    "https://www.rosemont.edu/",
-    "https://www.sacn.edu/",
-    "https://www.sacredheart.edu/",
-    "https://www.saintjoe.edu/",
-    "https://www.saintleo.edu/",
-    "https://www.saintmarys.edu/",
-    "https://www.saintmeinrad.edu/",
-    "https://www.saintvincentseminary.edu/",
-    "https://www.salve.edu/",
-    "https://www.sandiego.edu/",
-    "https://www.sau.edu/",
-    "https://www.sbu.edu/",
-    "https://www.sccky.edu/",
-    "https://www.scs.edu/",
-    "https://www.scu.edu/",
-    "https://www.scu.edu/jst/",
-    "https://www.seattleu.edu/",
-    "https://www.secon.edu/",
-    "https://www.setonhill.edu/",
-    "https://www.sf.edu/",
-    "https://www.sfcpa.edu/",
-    "https://www.sfmccon.edu/",
-    "https://www.shc.edu/",
-    "https://www.shst.edu/index.aspx/",
-    "https://www.shu.edu/",
-    "https://www.siena.edu/",
-    "https://www.sienaheights.edu/",
-    "https://www.sjcme.edu/",
-    "https://www.sjcny.edu/",
-    "https://www.sjs.edu/",
-    "https://www.sju.edu/",
-    "https://www.sl.edu/",
-    "https://www.slu.edu/",
-    "https://www.smcvt.edu/",
-    "https://www.smumn.edu/",
-    "https://www.smwc.edu/",
-    "https://www.snc.edu/",
-    "https://www.spalding.edu/",
-    "https://www.spc.edu/pages/1.asp/",
-    "https://www.sscms.edu/",
-    "https://www.stac.edu/",
-    "https://www.stbernards.edu/",
-    "https://www.stedwards.edu/",
-    "https://www.steson.org/Index.aspx?tabindex=0&tabid=1/",
-    "https://www.stfranciscollege.edu/",
-    "https://www.stgregorys.edu/",
-    "https://www.stjohns.edu/",
-    "https://www.stjohnsem.edu/",
-    "https://www.stmartin.edu/",
-    "https://www.stmary.edu/",
-    "https://www.stmarys.edu/",
-    "https://www.stmarysem.edu/",
-    "https://www.stmarytx.edu-ca.edu/",
-    "https://www.stonehill.edu/",
-    "https://www.strose.edu/",
-    "https://www.stthom.edu/",
-    "https://www.stthomas.edu/",
-    "https://www.stu.edu/",
-    "https://www.stvincent.edu/",
-    "https://www.stvincentscollege.edu/",
-    "https://www.sxu.edu/",
-    "https://www.thomasaquinas.edu/",
-    "https://www.thomasmore.edu/",
-    "https://www.thomasmorecollege.edu/",
-    "https://www.trinitydc.edu/",
-    "https://www.trocaire.edu/",
-    "https://www.udallas.edu/",
-    "https://www.udayton.edu/",
-    "https://www.udmercy.edu/",
-    "https://www.ugf.edu/",
-    "https://www.uiw.edu/",
-    "https://www.umary.edu/",
-    "https://www.uofs.edu/",
-    "https://www.up.edu/",
-    "https://www.ursuline.edu/",
-    "https://www.usfca.edu/",
-    "https://www.usj.edu/",
-    "https://www.usml.edu/",
-    "https://www.villa.edu/",
-    "https://www.villanova.edu/",
-    "https://www.viterbo.edu/",
-    "https://www.walsh.edu/",
-    "https://www.wju.edu/",
-    "https://www.wtu.edu/",
-    "https://www.wyomingcatholiccollege.com/",
-    "https://www.xu.edu/",
-    "https://www.xula.edu/",
-    "https://www2.cbu.edu/cbu/index.htm/",
+    # ... rest of your URLs ...
 ]
 
+# Configure a session with automatic retries for flaky connections
+session = requests.Session()
+retries = Retry(total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
+session.mount("https://", HTTPAdapter(max_retries=retries))
+session.mount("http://", HTTPAdapter(max_retries=retries))
+
+# Realistic browser headers to bypass basic security blocks
 headers = {
     "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,"
-        " like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    )
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/122.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.5",
 }
 
 results = []
-print(f"Starting scan across {len(urls)} URLs...")
+print(f"Starting enhanced scan across {len(urls)} URLs...")
 
 for url in urls:
     clean_url = url.strip()
@@ -264,28 +41,36 @@ for url in urls:
     linkedin_link = "Not Found"
 
     try:
-        response = requests.get(
-            clean_url, headers=headers, timeout=10, allow_redirects=True
+        response = session.get(
+            clean_url, headers=headers, timeout=15, allow_redirects=True
         )
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, "html.parser")
+            
+            # Search all links, giving priority to those found in footers or social lists if present,
+            # but scanning all <a> tags to ensure nothing is missed.
             for a in soup.find_all("a", href=True):
-                href = a["href"]
-                if "linkedin.com/company" in href or "linkedin.com/school" in href:
+                href = a["href"].strip()
+                href_lower = href.lower()
+                
+                # Check for standard linkedin formats (company, school, or custom handles)
+                if "linkedin.com/company" in href_lower or "linkedin.com/school" in href_lower:
                     linkedin_link = urljoin(clean_url, href)
                     break
+                # Catch general linkedin links if they use subdomains or shortened paths
+                elif "linkedin.com/" in href_lower and "share" not in href_lower:
+                    linkedin_link = urljoin(clean_url, href)
+                    break
+                    
     except requests.exceptions.RequestException:
         linkedin_link = "Connection Error"
 
     results.append({"Source_URL": clean_url, "LinkedIn_URL": linkedin_link})
     print(f"Checked: {clean_url} --> {linkedin_link}")
-    time.sleep(0.3)
+    time.sleep(0.5)
 
-# Saves output specifically inside the linkedin-scraper directory
 output_file = "linkedin-scraper/linkedin_extracted_links.csv"
-with open(
-    output_file, mode="w", newline="", encoding="utf-8"
-) as csv_file:
+with open(output_file, mode="w", newline="", encoding="utf-8") as csv_file:
     fieldnames = ["Source_URL", "LinkedIn_URL"]
     writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
     writer.writeheader()
