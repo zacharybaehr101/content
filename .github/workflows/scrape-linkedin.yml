@@ -1,0 +1,39 @@
+name: Run LinkedIn Scraper
+
+on:
+  workflow_dispatch: # Allows manual trigger from Actions tab
+  push:
+    branches: [ main ]
+    paths:
+      - 'linkedin-scraper/**' # Only triggers if you change code in this folder
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r linkedin-scraper/requirements.txt
+
+      - name: Run script
+        run: python linkedin-scraper/scraper.py
+
+      - name: Commit and push results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add linkedin-scraper/linkedin_extracted_links.csv
+          git commit -m "Auto-update LinkedIn extracted links CSV [skip ci]" || exit 0
+          git push
