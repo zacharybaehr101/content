@@ -248,12 +248,12 @@ urls = [
 
 # Define the target keyword categories and the words to look for in link text/hrefs
 categories = {
-    "NIL": ["nil", "name-image-likeness", "collective", "student-athlete-opportunities"],
-    "Dining": ["dining", "food", "eat", "meal", "cater", "cafeteria"],
-    "Residence": ["residence", "housing", "dorm", "living", "stay", "room"],
-    "Research": ["research", "grant", "lab", "faculty-scholarship", "study"],
-    "Travel": ["travel", "transportation", "parking", "directions", "map", "shuttle"],
-    "Alumni": ["alumni", "graduates", "giving", "donate", "advancement"],
+    "NIL": ["nil", "name-image-likeness", "collective"],
+    "Dining": ["dining", "food", "meal plan"],
+    "Residence": ["residence", "housing", "dorm", "living"],
+    "Research": ["research", "grant"],
+    "Travel": ["travel", "abroad"],
+    "Alumni": ["alumni", "graduates"],
 }
 
 headers = {
