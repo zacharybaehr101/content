@@ -4,30 +4,23 @@ import time
 from PIL import Image
 from google import genai
 
-# Retrieve API Key
 api_key = os.environ.get("GEMINI_API_KEY")
 if not api_key:
     print("WARNING: GEMINI_API_KEY environment variable is not set!")
 
 client = genai.Client(api_key=api_key)
 
-# Unified School Audit Prompt
 SCHOOL_AUDIT_PROMPT = """
-You are a web auditor for CampusVox. You are analyzing all captured webpage screenshots for this educational institution.
-
-Based on ALL the attached screenshots for this university, provide a comprehensive, structured audit covering:
-1. Overall Brand & Design Consistency across pages
-2. High-Level Messaging & Value Proposition Clarity
-3. Key Calls to Action (CTA) Effectiveness & Placement
-4. Information Architecture & Navigation Usability
-5. Visual Hierarchy, Layout Hygiene & Major Friction Points
-6. Summary Score & Final CampusVox Recommendations
+You are a web auditor for CampusVox. Analyze these webpage screenshots for this educational institution.
+Provide a structured assessment covering:
+1. Messaging & Value Proposition Clarity
+2. Call to Action (CTA) Effectiveness & Placement
+3. Information Architecture & Navigation Usability
+4. Layout Hygiene, Visual Hierarchy & Friction Points
 """
 
 def parse_fireshot_name(filename):
     base_name, _ = os.path.splitext(filename)
-    
-    # Extract domain inside square brackets [...]
     domain_match = re.search(r'\[(.*?)\]$', base_name)
     if domain_match:
         raw_domain = domain_match.group(1).lower().replace("www.", "")
@@ -49,6 +42,25 @@ def parse_fireshot_name(filename):
 
     return school_id, page_id
 
+def call_gemini_with_retry(contents, max_retries=3):
+    """Executes Gemini call and handles 429 rate limits gracefully with backoff."""
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=contents
+            )
+            # Sleep 6 seconds after every success to maintain < 10 RPM rate
+            time.sleep(6)
+            return response.text
+        except Exception as e:
+            if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                print(f" Rate limit hit. Pausing 20 seconds before retry (Attempt {attempt + 1}/{max_retries})...")
+                time.sleep(20)
+            else:
+                raise e
+    raise Exception("Exceeded max retries for Gemini API call.")
+
 def process_and_analyze():
     ready_dir = "ready-to-scan"
     artwork_base_dir = "website-artwork"
@@ -58,9 +70,7 @@ def process_and_analyze():
         print(f"Directory '{ready_dir}' missing.")
         return
 
-    # STEP 1: Group all files in ready-to-scan by school_id
     school_batches = {}
-    
     for filename in os.listdir(ready_dir):
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
             school_id, page_id = parse_fireshot_name(filename)
@@ -78,7 +88,6 @@ def process_and_analyze():
 
     print(f"Found {len(school_batches)} university batch(es) to process.\n")
 
-    # STEP 2: Process Artwork & Run Single Audit Per School
     for school_id, files in school_batches.items():
         print(f"==================================================")
         print(f"Processing School: {school_id.upper()} ({len(files)} pages)")
@@ -87,20 +96,18 @@ def process_and_analyze():
         school_artwork_dir = os.path.join(artwork_base_dir, school_id)
         os.makedirs(school_artwork_dir, exist_ok=True)
         
-        full_images_for_gemini = []
+        all_images_data = []
 
-        # Crop & convert all images for this school first
+        # 1. Process and crop all JPEGs for the repo first
         for item in files:
             raw_path = item['raw_path']
             page_id = item['page_id']
             artwork_path = os.path.join(school_artwork_dir, f"{page_id}.jpg")
 
             try:
-                # Open image for Gemini batch
                 img = Image.open(raw_path)
-                full_images_for_gemini.append(img)
+                all_images_data.append((img.copy(), page_id))
 
-                # Process cropped 1400px JPEG for repo
                 if img.mode in ("RGBA", "P"):
                     conv_img = img.convert("RGB")
                 else:
@@ -123,41 +130,42 @@ def process_and_analyze():
             except Exception as e:
                 print(f" Failed image processing for {item['filename']}: {e}")
 
-        # STEP 3: Single Gemini Request for the entire school
+        # 2. Chunk images into groups of max 4
+        chunk_size = 4
+        audit_notes = []
         report_path = os.path.join(school_artwork_dir, f"{school_id}-audit.md")
-        print(f"\n Running Unified Gemini Audit on {len(full_images_for_gemini)} pages for {school_id}...")
 
-        try:
-            # Combine all page screenshots + prompt into one request
-            contents = full_images_for_gemini + [SCHOOL_AUDIT_PROMPT]
+        for i in range(0, len(all_images_data), chunk_size):
+            chunk = all_images_data[i:i + chunk_size]
+            chunk_imgs = [item[0] for item in chunk]
+            chunk_pages = [item[1] for item in chunk]
             
-            # gemini-1.5-flash has higher free-tier limits (1,500 req/day)
-            response = client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=contents
-            )
+            print(f"\n Analyzing chunk {i//chunk_size + 1} for {school_id} (Pages: {', '.join(chunk_pages)})...")
 
+            try:
+                report_text = call_gemini_with_retry(chunk_imgs + [SCHOOL_AUDIT_PROMPT])
+                audit_notes.append(report_text)
+            except Exception as e:
+                print(f" Chunk analysis error: {e}")
+                audit_notes.append(f"*Chunk analysis failed due to error: {e}*")
+
+        # 3. Write combined audit report
+        try:
             with open(report_path, "w", encoding="utf-8") as f:
                 f.write(f"# CampusVox Comprehensive Audit: {school_id.upper()}\n\n")
-                f.write(response.text)
+                for idx, note in enumerate(audit_notes):
+                    f.write(f"## Audit Section {idx + 1}\n\n{note}\n\n---\n\n")
             print(f" Saved Consolidated Audit: {report_path}\n")
-
         except Exception as e:
-            print(f" Gemini School Audit failed for {school_id}: {e}")
-            with open(report_path, "w", encoding="utf-8") as f:
-                f.write(f"# Audit Error: {school_id.upper()}\n\n")
-                f.write(f"Gemini API audit failed with error:\n`{str(e)}`")
+            print(f" Failed to write report for {school_id}: {e}")
 
-        # STEP 4: Delete raw screenshot files from ready-to-scan
+        # 4. Clean up raw files
         for item in files:
             try:
                 if os.path.exists(item['raw_path']):
                     os.remove(item['raw_path'])
             except Exception as e:
                 print(f" Could not delete {item['filename']}: {e}")
-
-        # Sleep briefly between schools to respect per-minute limits
-        time.sleep(5)
 
 if __name__ == "__main__":
     process_and_analyze()
