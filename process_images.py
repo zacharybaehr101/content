@@ -9,23 +9,25 @@ api_key = os.environ.get("GEMINI_API_KEY")
 if not api_key:
     print("WARNING: GEMINI_API_KEY environment variable is not set!")
 
-# Initialize Gemini Client
 client = genai.Client(api_key=api_key)
 
-PAGE_ANALYSIS_PROMPT = """
-You are a web auditor for CampusVox. Analyze this COMPLETE webpage screenshot from top to bottom.
-Provide a structured analysis with the following:
-1. Primary Page Type & Goal (e.g., Homepage, Admissions, Financial Aid)
-2. Hero & Messaging Clarity (Value proposition, typography, primary headline)
-3. Call to Action (CTA) Placement & Contrast
-4. Navigation & Information Architecture Usability
-5. Layout Hygiene & Visual Friction
+# Unified School Audit Prompt
+SCHOOL_AUDIT_PROMPT = """
+You are a web auditor for CampusVox. You are analyzing all captured webpage screenshots for this educational institution.
+
+Based on ALL the attached screenshots for this university, provide a comprehensive, structured audit covering:
+1. Overall Brand & Design Consistency across pages
+2. High-Level Messaging & Value Proposition Clarity
+3. Key Calls to Action (CTA) Effectiveness & Placement
+4. Information Architecture & Navigation Usability
+5. Visual Hierarchy, Layout Hygiene & Major Friction Points
+6. Summary Score & Final CampusVox Recommendations
 """
 
 def parse_fireshot_name(filename):
     base_name, _ = os.path.splitext(filename)
     
-    # 1. Extract domain inside square brackets [...] at the end
+    # Extract domain inside square brackets [...]
     domain_match = re.search(r'\[(.*?)\]$', base_name)
     if domain_match:
         raw_domain = domain_match.group(1).lower().replace("www.", "")
@@ -33,10 +35,7 @@ def parse_fireshot_name(filename):
     else:
         school_id = "unknown-school"
         
-    # 2. Strip 'FireShot Capture #### - ' from the beginning
     clean = re.sub(r'^FireShot Capture \d+\s*-\s*', '', base_name, flags=re.IGNORECASE)
-    
-    # 3. Strip the trailing bracketed domain '[...]'
     clean = re.sub(r'\s*-\s*\[.*?\]$', '', clean)
     
     def slugify(text):
@@ -59,76 +58,106 @@ def process_and_analyze():
         print(f"Directory '{ready_dir}' missing.")
         return
 
-    print("Starting Pipeline: Domain Parsing -> Full Gemini Analysis -> Convert/Crop JPG")
-
+    # STEP 1: Group all files in ready-to-scan by school_id
+    school_batches = {}
+    
     for filename in os.listdir(ready_dir):
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
-            raw_path = os.path.join(ready_dir, filename)
-            
-            # STEP 1: Parse domain and page name
             school_id, page_id = parse_fireshot_name(filename)
-            print(f"Processing: School='{school_id}' | Page='{page_id}'")
-            
-            school_artwork_dir = os.path.join(artwork_base_dir, school_id)
-            os.makedirs(school_artwork_dir, exist_ok=True)
-            
+            if school_id not in school_batches:
+                school_batches[school_id] = []
+            school_batches[school_id].append({
+                'filename': filename,
+                'page_id': page_id,
+                'raw_path': os.path.join(ready_dir, filename)
+            })
+
+    if not school_batches:
+        print("No image files found in ready-to-scan.")
+        return
+
+    print(f"Found {len(school_batches)} university batch(es) to process.\n")
+
+    # STEP 2: Process Artwork & Run Single Audit Per School
+    for school_id, files in school_batches.items():
+        print(f"==================================================")
+        print(f"Processing School: {school_id.upper()} ({len(files)} pages)")
+        print(f"==================================================")
+        
+        school_artwork_dir = os.path.join(artwork_base_dir, school_id)
+        os.makedirs(school_artwork_dir, exist_ok=True)
+        
+        full_images_for_gemini = []
+
+        # Crop & convert all images for this school first
+        for item in files:
+            raw_path = item['raw_path']
+            page_id = item['page_id']
             artwork_path = os.path.join(school_artwork_dir, f"{page_id}.jpg")
-            report_path = os.path.join(school_artwork_dir, f"{page_id}-analysis.md")
 
-            # STEP 2: Gemini Analysis & Direct Markdown Output
-            print(f"Running Gemini Analysis for {filename}...")
             try:
-                full_img = Image.open(raw_path)
-                
-                response = client.models.generate_content(
-                    model='gemini-2.5-flash',
-                    contents=[full_img, PAGE_ANALYSIS_PROMPT]
-                )
-                
-                # Write Markdown Report
-                with open(report_path, "w", encoding="utf-8") as f:
-                    f.write(f"# Analysis: {school_id.upper()} - {page_id}\n\n")
-                    f.write(response.text)
-                print(f"--> Saved Report: {report_path}")
-                    
-            except Exception as e:
-                print(f"--> Gemini API Error for {filename}: {e}")
-                # Write fallback report so you can see exact error in the file if it fails
-                with open(report_path, "w", encoding="utf-8") as f:
-                    f.write(f"# Analysis Error: {school_id.upper()} - {page_id}\n\n")
-                    f.write(f"Gemini API processing failed with error:\n`{str(e)}`")
+                # Open image for Gemini batch
+                img = Image.open(raw_path)
+                full_images_for_gemini.append(img)
 
-            # STEP 3: Convert/Crop Artwork
-            try:
-                with Image.open(raw_path) as img:
-                    if img.mode in ("RGBA", "P"):
-                        img = img.convert("RGB")
-                    
-                    width, height = img.size
-                    crop_height = min(height, 1080)
-                    cropped_img = img.crop((0, 0, width, crop_height))
-                    
-                    if width > TARGET_WIDTH:
-                        scale_factor = TARGET_WIDTH / float(width)
-                        new_height = int(float(crop_height) * float(scale_factor))
-                        final_img = cropped_img.resize((TARGET_WIDTH, new_height), Image.Resampling.LANCZOS)
-                    else:
-                        final_img = cropped_img
-                    
-                    final_img.save(artwork_path, "JPEG", optimize=True, quality=82, dpi=(72, 72))
-                    print(f"--> Saved Artwork: {artwork_path}")
+                # Process cropped 1400px JPEG for repo
+                if img.mode in ("RGBA", "P"):
+                    conv_img = img.convert("RGB")
+                else:
+                    conv_img = img.copy()
+
+                width, height = conv_img.size
+                crop_height = min(height, 1080)
+                cropped_img = conv_img.crop((0, 0, width, crop_height))
+
+                if width > TARGET_WIDTH:
+                    scale_factor = TARGET_WIDTH / float(width)
+                    new_height = int(float(crop_height) * float(scale_factor))
+                    final_img = cropped_img.resize((TARGET_WIDTH, new_height), Image.Resampling.LANCZOS)
+                else:
+                    final_img = cropped_img
+
+                final_img.save(artwork_path, "JPEG", optimize=True, quality=82, dpi=(72, 72))
+                print(f" Saved Artwork: {artwork_path}")
 
             except Exception as e:
-                print(f"--> Conversion failed for {filename}: {e}")
+                print(f" Failed image processing for {item['filename']}: {e}")
 
-            # STEP 4: Delete raw screenshot
-            try:
-                if os.path.exists(raw_path):
-                    os.remove(raw_path)
-            except Exception as e:
-                print(f"Could not delete {filename}: {e}")
+        # STEP 3: Single Gemini Request for the entire school
+        report_path = os.path.join(school_artwork_dir, f"{school_id}-audit.md")
+        print(f"\n Running Unified Gemini Audit on {len(full_images_for_gemini)} pages for {school_id}...")
+
+        try:
+            # Combine all page screenshots + prompt into one request
+            contents = full_images_for_gemini + [SCHOOL_AUDIT_PROMPT]
             
-            time.sleep(2)
+            # gemini-1.5-flash has higher free-tier limits (1,500 req/day)
+            response = client.models.generate_content(
+                model='gemini-1.5-flash',
+                contents=contents
+            )
+
+            with open(report_path, "w", encoding="utf-8") as f:
+                f.write(f"# CampusVox Comprehensive Audit: {school_id.upper()}\n\n")
+                f.write(response.text)
+            print(f" Saved Consolidated Audit: {report_path}\n")
+
+        except Exception as e:
+            print(f" Gemini School Audit failed for {school_id}: {e}")
+            with open(report_path, "w", encoding="utf-8") as f:
+                f.write(f"# Audit Error: {school_id.upper()}\n\n")
+                f.write(f"Gemini API audit failed with error:\n`{str(e)}`")
+
+        # STEP 4: Delete raw screenshot files from ready-to-scan
+        for item in files:
+            try:
+                if os.path.exists(item['raw_path']):
+                    os.remove(item['raw_path'])
+            except Exception as e:
+                print(f" Could not delete {item['filename']}: {e}")
+
+        # Sleep briefly between schools to respect per-minute limits
+        time.sleep(5)
 
 if __name__ == "__main__":
     process_and_analyze()
