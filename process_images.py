@@ -5,7 +5,7 @@ import time
 from PIL import Image
 from google import genai
 
-# Initialize Gemini Client using the GitHub Secret variable
+# Initialize Gemini Client using the GitHub Secret environment variable
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 PAGE_ANALYSIS_PROMPT = """
@@ -18,9 +18,6 @@ Provide a structured analysis with the following:
 5. Layout Hygiene & Visual Friction
 """
 
-# =====================================================================
-# STEP 1 HELPER FUNCTION: FIRESHOT PARSER & RENAMER
-# =====================================================================
 def parse_fireshot_name(filename):
     base_name, _ = os.path.splitext(filename)
     
@@ -46,9 +43,6 @@ def parse_fireshot_name(filename):
 
     return slugify(school_raw), slugify(page_raw)
 
-# =====================================================================
-# MAIN PIPELINE: RENAME -> ANALYZE -> CROP/RESIZE -> CLEANUP
-# =====================================================================
 def process_and_analyze():
     ready_dir = "ready-to-scan"
     artwork_base_dir = "website-artwork"
@@ -93,7 +87,7 @@ def process_and_analyze():
             except Exception as e:
                 print(f"Gemini analysis failed for {filename}: {e}")
 
-            # STEP 3: Convert PNG to JPG, Crop Top Section, & Resize to 1400px Wide
+            # STEP 3: Convert PNG/JPEG, Crop Top Section, & Resize to 1400px Wide
             try:
                 with Image.open(raw_path) as img:
                     if img.mode in ("RGBA", "P"):
@@ -110,7 +104,7 @@ def process_and_analyze():
                     else:
                         final_img = cropped_img
                     
-                    # Save web-optimized JPG
+                    # Save web-optimized 72 DPI JPG
                     final_img.save(artwork_path, "JPEG", optimize=True, quality=82, dpi=(72, 72))
                     print(f"Saved Artwork: {artwork_path}")
 
@@ -118,8 +112,12 @@ def process_and_analyze():
                 print(f"Conversion/Crop failed for {filename}: {e}")
 
             # STEP 4: Delete raw screenshot to save GitHub space
-            os.remove(raw_path)
-            print(f"Cleaned up raw file: {filename}\n")
+            try:
+                if os.path.exists(raw_path):
+                    os.remove(raw_path)
+                    print(f"Cleaned up raw file: {filename}\n")
+            except Exception as e:
+                print(f"Could not delete {filename}: {e}")
             
             # Brief pause to respect API rate limits
             time.sleep(2)
