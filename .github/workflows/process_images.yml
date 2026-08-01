@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout Repository Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -35,5 +37,5 @@ jobs:
       - name: Commit and Push All Changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "auto: crop, analyze with Gemini, and move completed screenshots"
-          file_pattern: "ready-to-scan/** website-artwork/** scanned/**"
+          commit_message: "auto: process images & gemini analysis"
+          file_pattern: "ready-to-scan/** website-artwork/**"
