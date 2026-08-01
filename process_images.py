@@ -18,31 +18,42 @@ Provide a structured analysis with the following:
 5. Layout Hygiene & Visual Friction
 """
 
+# =====================================================================
+# STEP 1: BULLETPROOF DOMAIN-BASED FIRESHOT PARSER & RENAMER
+# =====================================================================
 def parse_fireshot_name(filename):
     base_name, _ = os.path.splitext(filename)
     
-    # 1. Strip 'FireShot Capture #### - '
+    # 1. Extract domain inside square brackets [...] at the end
+    domain_match = re.search(r'\[(.*?)\]$', base_name)
+    if domain_match:
+        raw_domain = domain_match.group(1).lower().replace("www.", "")
+        # Turns "anselm.edu" -> "anselm-edu" or "css.edu" -> "css-edu"
+        school_id = re.sub(r'[^a-z0-9]+', '-', raw_domain).strip('-')
+    else:
+        school_id = "unknown-school"
+        
+    # 2. Strip 'FireShot Capture #### - ' from the beginning
     clean = re.sub(r'^FireShot Capture \d+\s*-\s*', '', base_name, flags=re.IGNORECASE)
-    # 2. Strip trailing domain in brackets '[www.domain.com]'
+    
+    # 3. Strip the trailing bracketed domain '[...]'
     clean = re.sub(r'\s*-\s*\[.*?\]$', '', clean)
     
-    parts = [p.strip() for p in clean.split('-') if p.strip()]
-    
-    if len(parts) >= 2:
-        school_raw = parts[-1]          # School name is usually at the end
-        page_raw = "-".join(parts[:-1]) # Page description is at the front
-    else:
-        school_raw = clean
-        page_raw = "homepage"
-
-    # Convert text to URL-safe hyphenated slugs
+    # 4. Convert the remaining page title into a clean slug
     def slugify(text):
         text = text.lower().replace("www.", "")
         text = re.sub(r'[^a-z0-9]+', '-', text)
         return text.strip('-')
 
-    return slugify(school_raw), slugify(page_raw)
+    page_id = slugify(clean)
+    if not page_id:
+        page_id = "homepage"
 
+    return school_id, page_id
+
+# =====================================================================
+# MAIN PIPELINE: RENAME -> ANALYZE -> CROP/RESIZE -> CLEANUP
+# =====================================================================
 def process_and_analyze():
     ready_dir = "ready-to-scan"
     artwork_base_dir = "website-artwork"
@@ -52,13 +63,13 @@ def process_and_analyze():
         print(f"Directory '{ready_dir}' missing.")
         return
 
-    print("Starting Pipeline: Rename FireShot -> Full Gemini Analysis -> Convert/Crop JPG")
+    print("Starting Pipeline: Domain Parsing -> Full Gemini Analysis -> Convert/Crop JPG")
 
     for filename in os.listdir(ready_dir):
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
             raw_path = os.path.join(ready_dir, filename)
             
-            # STEP 1: Parse and clean FireShot name
+            # STEP 1: Parse domain and clean page name
             school_id, page_id = parse_fireshot_name(filename)
             print(f"Processing: School='{school_id}' | Page='{page_id}'")
             
