@@ -133,7 +133,7 @@ def process_and_analyze():
             
             # gemini-1.5-flash has higher free-tier limits (1,500 req/day)
             response = client.models.generate_content(
-                model='gemini-1.5-flash',
+                model='gemini-2.5-flash',
                 contents=contents
             )
 
