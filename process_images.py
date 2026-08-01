@@ -1,12 +1,16 @@
 import os
 import re
-import json
 import time
 from PIL import Image
 from google import genai
 
-# Initialize Gemini Client using the GitHub Secret environment variable
-client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+# Retrieve API Key
+api_key = os.environ.get("GEMINI_API_KEY")
+if not api_key:
+    print("WARNING: GEMINI_API_KEY environment variable is not set!")
+
+# Initialize Gemini Client
+client = genai.Client(api_key=api_key)
 
 PAGE_ANALYSIS_PROMPT = """
 You are a web auditor for CampusVox. Analyze this COMPLETE webpage screenshot from top to bottom.
@@ -18,9 +22,6 @@ Provide a structured analysis with the following:
 5. Layout Hygiene & Visual Friction
 """
 
-# =====================================================================
-# STEP 1: BULLETPROOF DOMAIN-BASED FIRESHOT PARSER & RENAMER
-# =====================================================================
 def parse_fireshot_name(filename):
     base_name, _ = os.path.splitext(filename)
     
@@ -28,7 +29,6 @@ def parse_fireshot_name(filename):
     domain_match = re.search(r'\[(.*?)\]$', base_name)
     if domain_match:
         raw_domain = domain_match.group(1).lower().replace("www.", "")
-        # Turns "anselm.edu" -> "anselm-edu" or "css.edu" -> "css-edu"
         school_id = re.sub(r'[^a-z0-9]+', '-', raw_domain).strip('-')
     else:
         school_id = "unknown-school"
@@ -39,7 +39,6 @@ def parse_fireshot_name(filename):
     # 3. Strip the trailing bracketed domain '[...]'
     clean = re.sub(r'\s*-\s*\[.*?\]$', '', clean)
     
-    # 4. Convert the remaining page title into a clean slug
     def slugify(text):
         text = text.lower().replace("www.", "")
         text = re.sub(r'[^a-z0-9]+', '-', text)
@@ -51,9 +50,6 @@ def parse_fireshot_name(filename):
 
     return school_id, page_id
 
-# =====================================================================
-# MAIN PIPELINE: RENAME -> ANALYZE -> CROP/RESIZE -> CLEANUP
-# =====================================================================
 def process_and_analyze():
     ready_dir = "ready-to-scan"
     artwork_base_dir = "website-artwork"
@@ -69,7 +65,7 @@ def process_and_analyze():
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
             raw_path = os.path.join(ready_dir, filename)
             
-            # STEP 1: Parse domain and clean page name
+            # STEP 1: Parse domain and page name
             school_id, page_id = parse_fireshot_name(filename)
             print(f"Processing: School='{school_id}' | Page='{page_id}'")
             
@@ -79,9 +75,9 @@ def process_and_analyze():
             artwork_path = os.path.join(school_artwork_dir, f"{page_id}.jpg")
             report_path = os.path.join(school_artwork_dir, f"{page_id}-analysis.md")
 
-            # STEP 2: Full Uncropped Image Gemini Analysis
+            # STEP 2: Gemini Analysis & Direct Markdown Output
+            print(f"Running Gemini Analysis for {filename}...")
             try:
-                print(f"Running Gemini Analysis on full screenshot...")
                 full_img = Image.open(raw_path)
                 
                 response = client.models.generate_content(
@@ -89,16 +85,20 @@ def process_and_analyze():
                     contents=[full_img, PAGE_ANALYSIS_PROMPT]
                 )
                 
-                # Save markdown analysis report
+                # Write Markdown Report
                 with open(report_path, "w", encoding="utf-8") as f:
                     f.write(f"# Analysis: {school_id.upper()} - {page_id}\n\n")
                     f.write(response.text)
-                print(f"Saved Report: {report_path}")
+                print(f"--> Saved Report: {report_path}")
                     
             except Exception as e:
-                print(f"Gemini analysis failed for {filename}: {e}")
+                print(f"--> Gemini API Error for {filename}: {e}")
+                # Write fallback report so you can see exact error in the file if it fails
+                with open(report_path, "w", encoding="utf-8") as f:
+                    f.write(f"# Analysis Error: {school_id.upper()} - {page_id}\n\n")
+                    f.write(f"Gemini API processing failed with error:\n`{str(e)}`")
 
-            # STEP 3: Convert PNG/JPEG, Crop Top Section, & Resize to 1400px Wide
+            # STEP 3: Convert/Crop Artwork
             try:
                 with Image.open(raw_path) as img:
                     if img.mode in ("RGBA", "P"):
@@ -115,22 +115,19 @@ def process_and_analyze():
                     else:
                         final_img = cropped_img
                     
-                    # Save web-optimized 72 DPI JPG
                     final_img.save(artwork_path, "JPEG", optimize=True, quality=82, dpi=(72, 72))
-                    print(f"Saved Artwork: {artwork_path}")
+                    print(f"--> Saved Artwork: {artwork_path}")
 
             except Exception as e:
-                print(f"Conversion/Crop failed for {filename}: {e}")
+                print(f"--> Conversion failed for {filename}: {e}")
 
-            # STEP 4: Delete raw screenshot to save GitHub space
+            # STEP 4: Delete raw screenshot
             try:
                 if os.path.exists(raw_path):
                     os.remove(raw_path)
-                    print(f"Cleaned up raw file: {filename}\n")
             except Exception as e:
                 print(f"Could not delete {filename}: {e}")
             
-            # Brief pause to respect API rate limits
             time.sleep(2)
 
 if __name__ == "__main__":
