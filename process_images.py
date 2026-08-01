@@ -1,128 +1,128 @@
 import os
 import re
-import shutil
+import json
+import time
 from PIL import Image
 from google import genai
 
-# Initialize Gemini Client using the repository secret environment variable
+# Initialize Gemini Client using the GitHub Secret variable
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
-ANALYSIS_PROMPT = """
-You are an expert UX/UI designer, web auditor, and content strategist analyzing website hero sections ("above-the-fold" views) for CampusVox. 
-
-Review the attached cropped website screenshot(s) and provide a structured, actionable content analysis focusing on the following dimensions:
-
-1. Visual & First Impression Hierarchy
-   - What is the immediate visual focal point (hero image, video, headline, or CTA)?
-   - Does the branding, typography, and color scheme communicate clarity and trust within 3 seconds?
-
-2. Value Proposition & Messaging Clarity
-   - What key message or value proposition is communicated above the fold?
-   - Is the target audience immediately clear, or is the messaging vague/generic?
-
-3. Call to Action (CTA) Effectiveness
-   - What primary action is the user prompted to take?
-   - Is the CTA visually distinct, contrasting, and positioned intuitively?
-
-4. Layout & Structural Hygiene
-   - Are key visual components (navigation bar, search, primary copy, CTAs) balanced, or does the layout feel cluttered/cramped?
-   - Are there any glaring visual layout issues, poor contrast, or unreadable text elements?
-
-5. Strategic Recommendations
-   - Provide 2–3 high-impact, actionable optimizations to improve conversion, clarity, or visual engagement for this specific layout.
-
-Format your response using clear section headers, concise bullet points, and high-impact observations.
+PAGE_ANALYSIS_PROMPT = """
+You are a web auditor for CampusVox. Analyze this COMPLETE webpage screenshot from top to bottom.
+Provide a structured analysis with the following:
+1. Primary Page Type & Goal (e.g., Homepage, Admissions, Financial Aid)
+2. Hero & Messaging Clarity (Value proposition, typography, primary headline)
+3. Call to Action (CTA) Placement & Contrast
+4. Navigation & Information Architecture Usability
+5. Layout Hygiene & Visual Friction
 """
 
-def process_and_analyze_all():
+# =====================================================================
+# STEP 1 HELPER FUNCTION: FIRESHOT PARSER & RENAMER
+# =====================================================================
+def parse_fireshot_name(filename):
+    base_name, _ = os.path.splitext(filename)
+    
+    # 1. Strip 'FireShot Capture #### - '
+    clean = re.sub(r'^FireShot Capture \d+\s*-\s*', '', base_name, flags=re.IGNORECASE)
+    # 2. Strip trailing domain in brackets '[www.domain.com]'
+    clean = re.sub(r'\s*-\s*\[.*?\]$', '', clean)
+    
+    parts = [p.strip() for p in clean.split('-') if p.strip()]
+    
+    if len(parts) >= 2:
+        school_raw = parts[-1]          # School name is usually at the end
+        page_raw = "-".join(parts[:-1]) # Page description is at the front
+    else:
+        school_raw = clean
+        page_raw = "homepage"
+
+    # Convert text to URL-safe hyphenated slugs
+    def slugify(text):
+        text = text.lower().replace("www.", "")
+        text = re.sub(r'[^a-z0-9]+', '-', text)
+        return text.strip('-')
+
+    return slugify(school_raw), slugify(page_raw)
+
+# =====================================================================
+# MAIN PIPELINE: RENAME -> ANALYZE -> CROP/RESIZE -> CLEANUP
+# =====================================================================
+def process_and_analyze():
     ready_dir = "ready-to-scan"
     artwork_base_dir = "website-artwork"
-    scanned_base_dir = "scanned"  # Completed original screenshots moved here
-    
-    TARGET_WIDTH = 1200  
-    valid_extensions = ('.png', '.jpg', '.jpeg', '.webp', '.tiff', '.bmp')
+    TARGET_WIDTH = 1400
     
     if not os.path.exists(ready_dir):
-        print(f"Directory '{ready_dir}' does not exist yet. Skipping.")
+        print(f"Directory '{ready_dir}' missing.")
         return
 
-    print("Starting processing, cropping, and Gemini analysis pipeline...")
-    
-    # Traverse through ready-to-scan
-    for dirpath, _, filenames in os.walk(ready_dir):
-        for filename in filenames:
-            if filename.lower().endswith(valid_extensions):
-                file_path = os.path.join(dirpath, filename)
-                
-                # 1. Clean filename (remove "screencapture-")
-                cleaned_filename = filename.replace("screencapture-", "")
-                
-                # Calculate relative path to maintain subfolder structures across folders
-                relative_path = os.path.relpath(dirpath, ready_dir)
-                
-                # Target directories for Artwork, Scanned, and Analysis
-                target_artwork_dir = os.path.normpath(os.path.join(artwork_base_dir, relative_path))
-                target_scanned_dir = os.path.normpath(os.path.join(scanned_base_dir, relative_path))
-                
-                os.makedirs(target_artwork_dir, exist_ok=True)
-                os.makedirs(target_scanned_dir, exist_ok=True)
-                
-                # Clean trailing digits from base name
-                base_name, ext = os.path.splitext(cleaned_filename)
-                clean_base_name = re.sub(r'[-_]\d+$', '', base_name)
-                
-                artwork_filename = f"{clean_base_name}{ext}"
-                artwork_path = os.path.join(target_artwork_dir, artwork_filename)
-                report_path = os.path.join(target_artwork_dir, f"{clean_base_name}-analysis.md")
-                done_original_path = os.path.join(target_scanned_dir, f"{clean_base_name}{ext}")
-                
-                # 2. Crop & Resize
-                try:
-                    with Image.open(file_path) as img:
-                        width, height = img.size
-                        crop_height = min(height, 1080)
-                        cropped_img = img.crop((0, 0, width, crop_height))
-                        
-                        if width > TARGET_WIDTH:
-                            scale_factor = TARGET_WIDTH / float(width)
-                            new_height = int(float(crop_height) * float(scale_factor))
-                            final_img = cropped_img.resize((TARGET_WIDTH, new_height), Image.Resampling.LANCZOS)
-                        else:
-                            final_img = cropped_img
-                        
-                        final_img.save(artwork_path, optimize=True, quality=85)
-                        print(f"Artwork saved: {artwork_path}")
-                        
-                except Exception as e:
-                    print(f"Error processing image {filename}: {e}")
-                    continue
+    print("Starting Pipeline: Rename FireShot -> Full Gemini Analysis -> Convert/Crop JPG")
 
-                # 3. Call Gemini API for Content Analysis
-                try:
-                    print(f"Running Gemini Analysis for {artwork_filename}...")
-                    analysis_image = Image.open(artwork_path)
-                    
-                    response = client.models.generate_content(
-                        model='gemini-2.5-flash',
-                        contents=[analysis_image, ANALYSIS_PROMPT]
-                    )
-                    
-                    # Save analysis report as markdown
-                    with open(report_path, "w", encoding="utf-8") as f:
-                        f.write(f"# CampusVox Audit Report: {clean_base_name}\n\n")
-                        f.write(f"![{clean_base_name}]({artwork_filename})\n\n")
-                        f.write(response.text)
-                    print(f"Analysis saved: {report_path}")
-                    
-                except Exception as e:
-                    print(f"Gemini API call failed for {filename}: {e}")
+    for filename in os.listdir(ready_dir):
+        if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
+            raw_path = os.path.join(ready_dir, filename)
+            
+            # STEP 1: Parse and clean FireShot name
+            school_id, page_id = parse_fireshot_name(filename)
+            print(f"Processing: School='{school_id}' | Page='{page_id}'")
+            
+            school_artwork_dir = os.path.join(artwork_base_dir, school_id)
+            os.makedirs(school_artwork_dir, exist_ok=True)
+            
+            artwork_path = os.path.join(school_artwork_dir, f"{page_id}.jpg")
+            report_path = os.path.join(school_artwork_dir, f"{page_id}-analysis.md")
 
-                # 4. Move raw file out of ready-to-scan to indicate completion
-                try:
-                    shutil.move(file_path, done_original_path)
-                    print(f"Moved raw file to completed folder: {done_original_path}")
-                except Exception as e:
-                    print(f"Error moving finished file {filename}: {e}")
+            # STEP 2: Full Uncropped Image Gemini Analysis
+            try:
+                print(f"Running Gemini Analysis on full screenshot...")
+                full_img = Image.open(raw_path)
+                
+                response = client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=[full_img, PAGE_ANALYSIS_PROMPT]
+                )
+                
+                # Save markdown analysis report
+                with open(report_path, "w", encoding="utf-8") as f:
+                    f.write(f"# Analysis: {school_id.upper()} - {page_id}\n\n")
+                    f.write(response.text)
+                print(f"Saved Report: {report_path}")
+                    
+            except Exception as e:
+                print(f"Gemini analysis failed for {filename}: {e}")
+
+            # STEP 3: Convert PNG to JPG, Crop Top Section, & Resize to 1400px Wide
+            try:
+                with Image.open(raw_path) as img:
+                    if img.mode in ("RGBA", "P"):
+                        img = img.convert("RGB")
+                    
+                    width, height = img.size
+                    crop_height = min(height, 1080)
+                    cropped_img = img.crop((0, 0, width, crop_height))
+                    
+                    if width > TARGET_WIDTH:
+                        scale_factor = TARGET_WIDTH / float(width)
+                        new_height = int(float(crop_height) * float(scale_factor))
+                        final_img = cropped_img.resize((TARGET_WIDTH, new_height), Image.Resampling.LANCZOS)
+                    else:
+                        final_img = cropped_img
+                    
+                    # Save web-optimized JPG
+                    final_img.save(artwork_path, "JPEG", optimize=True, quality=82, dpi=(72, 72))
+                    print(f"Saved Artwork: {artwork_path}")
+
+            except Exception as e:
+                print(f"Conversion/Crop failed for {filename}: {e}")
+
+            # STEP 4: Delete raw screenshot to save GitHub space
+            os.remove(raw_path)
+            print(f"Cleaned up raw file: {filename}\n")
+            
+            # Brief pause to respect API rate limits
+            time.sleep(2)
 
 if __name__ == "__main__":
-    process_and_analyze_all()
+    process_and_analyze()
