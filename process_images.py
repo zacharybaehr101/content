@@ -4,23 +4,66 @@ import time
 from PIL import Image
 from google import genai
 
+# Retrieve API Key
 api_key = os.environ.get("GEMINI_API_KEY")
 if not api_key:
     print("WARNING: GEMINI_API_KEY environment variable is not set!")
 
 client = genai.Client(api_key=api_key)
 
+# Exact CampusVox Brand Storyteller Prompt
 SCHOOL_AUDIT_PROMPT = """
-You are a web auditor for CampusVox. Analyze these webpage screenshots for this educational institution.
-Provide a structured assessment covering:
-1. Messaging & Value Proposition Clarity
-2. Call to Action (CTA) Effectiveness & Placement
-3. Information Architecture & Navigation Usability
-4. Layout Hygiene, Visual Hierarchy & Friction Points
+You are a CampusVox Brand Storyteller — a warm, experienced advisor to Catholic college 
+communications directors and web teams. You've spent years helping schools find and 
+amplify their most authentic voice.
+
+Analyze these webpage screenshots as a complete picture of how this school 
+tells its story online. Your audience is the communications director or web designer 
+who built these pages. Speak to them directly, collegially, and encouragingly.
+
+Focus on:
+- The words they chose and why they work
+- How the imagery and art reinforce (or create) the school's identity
+- What makes this school's digital voice distinctive
+- What other schools could learn from their approach
+
+Avoid: UX nitpicks, button colors, font sizes, or anything that reads as criticism.
+Every observation should feel like a compliment or an insight, never a grade.
+
+Structure your response exactly as follows:
+
+# [School Name] — Brand Story Analysis
+
+## What They're Saying
+A 2–3 sentence description of the school's core message and who they're 
+speaking to. Write it like you're describing a person's personality, not 
+evaluating a marketing strategy.
+
+## The Words That Work
+Pull 4–6 specific phrases, headlines, or word choices from the pages that 
+are doing real work. For each one, explain in 1–2 sentences why that 
+language is effective and what it signals to prospective students and families.
+
+## The Visual Story
+2–3 observations about how the imagery, color, and visual choices reinforce 
+the school's identity and message. Focus on what the art is *saying*, not 
+how it looks technically.
+
+## What to Borrow
+3 specific, actionable ideas — written as enthusiastic recommendations — 
+that other Catholic school communicators could adapt from this school's 
+approach. Use bold headers for each. Make them feel like insider tips from 
+a trusted colleague, not consulting deliverables.
+
+## The One Thing
+One sentence that captures the single most distinctive thing about how 
+this school tells its story online.
 """
 
 def parse_fireshot_name(filename):
     base_name, _ = os.path.splitext(filename)
+    
+    # 1. Extract domain inside square brackets [...] at the end
     domain_match = re.search(r'\[(.*?)\]$', base_name)
     if domain_match:
         raw_domain = domain_match.group(1).lower().replace("www.", "")
@@ -28,6 +71,7 @@ def parse_fireshot_name(filename):
     else:
         school_id = "unknown-school"
         
+    # 2. Clean up filename slug
     clean = re.sub(r'^FireShot Capture \d+\s*-\s*', '', base_name, flags=re.IGNORECASE)
     clean = re.sub(r'\s*-\s*\[.*?\]$', '', clean)
     
@@ -50,13 +94,12 @@ def call_gemini_with_retry(contents, max_retries=3):
                 model='gemini-2.5-flash',
                 contents=contents
             )
-            # Sleep 6 seconds after every success to maintain < 10 RPM rate
-            time.sleep(6)
+            time.sleep(10)  # Sleep briefly after success to stay under rate limits
             return response.text
         except Exception as e:
             if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
-                print(f" Rate limit hit. Pausing 20 seconds before retry (Attempt {attempt + 1}/{max_retries})...")
-                time.sleep(20)
+                print(f" Rate limit hit. Pausing 25 seconds before retry (Attempt {attempt + 1}/{max_retries})...")
+                time.sleep(25)
             else:
                 raise e
     raise Exception("Exceeded max retries for Gemini API call.")
@@ -70,6 +113,7 @@ def process_and_analyze():
         print(f"Directory '{ready_dir}' missing.")
         return
 
+    # STEP 1: Group files in ready-to-scan by school_id
     school_batches = {}
     for filename in os.listdir(ready_dir):
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
@@ -88,6 +132,7 @@ def process_and_analyze():
 
     print(f"Found {len(school_batches)} university batch(es) to process.\n")
 
+    # STEP 2: Process Artwork & Execute Brand Story Audit Per School
     for school_id, files in school_batches.items():
         print(f"==================================================")
         print(f"Processing School: {school_id.upper()} ({len(files)} pages)")
@@ -96,9 +141,9 @@ def process_and_analyze():
         school_artwork_dir = os.path.join(artwork_base_dir, school_id)
         os.makedirs(school_artwork_dir, exist_ok=True)
         
-        all_images_data = []
+        all_images = []
 
-        # 1. Process and crop all JPEGs for the repo first
+        # Convert and crop all JPEGs for repository storage
         for item in files:
             raw_path = item['raw_path']
             page_id = item['page_id']
@@ -106,7 +151,7 @@ def process_and_analyze():
 
             try:
                 img = Image.open(raw_path)
-                all_images_data.append((img.copy(), page_id))
+                all_images.append(img.copy())
 
                 if img.mode in ("RGBA", "P"):
                     conv_img = img.convert("RGB")
@@ -130,36 +175,25 @@ def process_and_analyze():
             except Exception as e:
                 print(f" Failed image processing for {item['filename']}: {e}")
 
-        # 2. Chunk images into groups of max 4
-        chunk_size = 4
-        audit_notes = []
+        # Execute single brand storyteller audit call for the whole school
         report_path = os.path.join(school_artwork_dir, f"{school_id}-audit.md")
+        print(f"\n Generating Brand Story Analysis for {school_id} across {len(all_images)} pages...")
 
-        for i in range(0, len(all_images_data), chunk_size):
-            chunk = all_images_data[i:i + chunk_size]
-            chunk_imgs = [item[0] for item in chunk]
-            chunk_pages = [item[1] for item in chunk]
-            
-            print(f"\n Analyzing chunk {i//chunk_size + 1} for {school_id} (Pages: {', '.join(chunk_pages)})...")
-
-            try:
-                report_text = call_gemini_with_retry(chunk_imgs + [SCHOOL_AUDIT_PROMPT])
-                audit_notes.append(report_text)
-            except Exception as e:
-                print(f" Chunk analysis error: {e}")
-                audit_notes.append(f"*Chunk analysis failed due to error: {e}*")
-
-        # 3. Write combined audit report
         try:
-            with open(report_path, "w", encoding="utf-8") as f:
-                f.write(f"# CampusVox Comprehensive Audit: {school_id.upper()}\n\n")
-                for idx, note in enumerate(audit_notes):
-                    f.write(f"## Audit Section {idx + 1}\n\n{note}\n\n---\n\n")
-            print(f" Saved Consolidated Audit: {report_path}\n")
-        except Exception as e:
-            print(f" Failed to write report for {school_id}: {e}")
+            payload = all_images + [SCHOOL_AUDIT_PROMPT]
+            report_text = call_gemini_with_retry(payload)
 
-        # 4. Clean up raw files
+            with open(report_path, "w", encoding="utf-8") as f:
+                f.write(report_text)
+            print(f" Saved Brand Story Audit: {report_path}\n")
+
+        except Exception as e:
+            print(f" School analysis error for {school_id}: {e}")
+            with open(report_path, "w", encoding="utf-8") as f:
+                f.write(f"# Brand Story Analysis Error: {school_id.upper()}\n\n")
+                f.write(f"Gemini API call failed: `{e}`")
+
+        # Clean up raw images from ready-to-scan
         for item in files:
             try:
                 if os.path.exists(item['raw_path']):
