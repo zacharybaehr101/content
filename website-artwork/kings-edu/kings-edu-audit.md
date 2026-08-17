@@ -1,0 +1,25 @@
+# King's College — Brand Story Analysis
+
+## What They're Saying
+King's College tells the story of a vibrant, supportive community where students not only gain a strong academic foundation but also discover their purpose and thrive. They present themselves as a nurturing environment, rooted in the Holy Cross tradition, that intentionally prepares students for a lifetime of success and meaningful contribution.
+
+## The Words That Work
+*   **"AT KING'S COLLEGE COURAGE CAN'T WAIT"** (Homepage hero): This powerful and active headline immediately suggests an empowering environment where students are encouraged to be bold and seize opportunities from day one. It communicates a sense of proactive growth and limitless potential.
+*   **"Who Thrives at King's?"** (Homepage): This inviting question encourages prospective students to self-identify and envision themselves within the community. It moves beyond generic descriptions to create a personal connection, highlighting key values like curiosity, compassion, and courage.
+*   **"The Holy Cross Difference"** (Homepage): This phrase clearly articulates King's unique value proposition. For those familiar with the Holy Cross tradition, it immediately signals a specific ethos of intellectual rigor, spiritual development, and service, while for others, it sparks curiosity about what makes the college distinct.
+*   **"It’s About Lifelong Success"** (Homepage): By broadening the definition of success beyond just a first job, this statement signals King's commitment to a student's entire journey. It implies a holistic approach to education that prepares graduates for sustained impact and fulfillment.
+*   **"This is an Education You Can Afford"** (Homepage/Tuition page): This direct and reassuring statement proactively addresses a primary concern for many families. It implies transparency and a commitment to accessibility, making the financial conversation feel supportive rather than intimidating.
+*   **"Our mission is to enhance the quality of campus life"** (Campus Life page): This clear articulation highlights the intentionality behind their student experience initiatives. It signals that student well-being and engagement are central to the college’s purpose, fostering a vibrant and enriching environment.
+
+## The Visual Story
+*   **Active, Engaged Students:** The visuals consistently feature students actively participating in diverse settings – from collaborating in classrooms to engaging in service, sports, and social gatherings. This dynamic portrayal powerfully conveys an environment where students are at the heart of every experience, fully immersed and thriving.
+*   **Community and Connection:** A recurring visual theme is students interacting, laughing, and supporting each other, often in groups. This emphasis on human connection, paired with diverse representation, beautifully reinforces King's message of a close-knit, welcoming community where strong bonds are formed.
+*   **Modern and Accessible Campus:** The photography, while honoring traditional architecture, often highlights bright, contemporary learning spaces and well-maintained grounds. The natural lighting and inviting compositions present the campus as both welcoming and forward-looking, a place where students can comfortably learn, grow, and live.
+
+## What to Borrow
+*   **Show, Don't Just Tell, Your Outcomes:** King's masterfully integrates compelling statistics about post-graduation success, internships, and financial accessibility directly into their homepage narrative (e.g., "34% enter grad school," "56% earn $50k+," "100% of students receive aid"). This immediate visual proof of tangible return on investment is incredibly persuasive; other schools could greatly benefit from featuring key outcome metrics prominently and early in their digital journeys.
+*   **Frame Your Unique Difference as an Invitation:** The "Who Thrives at King's?" and "The Holy Cross Difference" sections are brilliant examples of inviting prospective students to engage with the college's distinct identity rather than just listing facts. This approach makes the brand feel deeply personal and encourages self-reflection, drawing in students who genuinely resonate with their specific values and community.
+*   **Prioritize Transparency on Cost:** The detailed Tuition page, offering comprehensive breakdowns of annual costs, specific fees, and even per-credit expenses for part-time students, is an outstanding model for financial transparency. By providing such thorough information upfront, King's builds trust and empowers families to plan effectively, significantly reducing common anxieties about college costs.
+
+## The One Thing
+King's College masterfully balances transparent, data-driven outcomes with a warm, community-focused narrative, painting a distinct picture of both aspiration and belonging.
